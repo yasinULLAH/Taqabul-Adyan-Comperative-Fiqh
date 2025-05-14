@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FiqhCompare Studio - by Yasin Ullah</title>
+    <style>
+        /* Global Resets and Base Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Noto Sans', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e2f; /* Dark blue-gray */
+            color: #dcdce0; /* Light gray for text */
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-size: 16px;
+        }
+
+        /* Font for Arabic/Urdu content - Noto Naskh Arabic is good for general Arabic, Noto Nastaliq Urdu for Urdu */
+        .arabic-urdu-text, textarea[data-lang="ar"], textarea[data-lang="ur"], input[data-lang="ar"], input[data-lang="ur"] {
+            font-family: 'Noto Naskh Arabic', 'Noto Nastaliq Urdu', 'Arial', sans-serif;
+            direction: rtl;
+            text-align: right;
+        }
+        /* Auto direction for inputs where mixed content is expected */
+        textarea[dir="auto"], input[dir="auto"] {
+            font-family: 'Segoe UI', 'Noto Sans', 'Noto Naskh Arabic', 'Noto Nastaliq Urdu', Tahoma, Arial, sans-serif;
+        }
+
+
+        /* Layout */
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        header {
+            background-color: #2a2a3e; /* Slightly lighter dark blue */
+            padding: 15px 0;
+            border-bottom: 2px solid #4a4a6a; /* Accent color */
+            text-align: center;
+        }
+
+        header h1 {
+            color: #8a8aff; /* Light purple/blue accent */
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        header .author-tag {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        nav button, .button, button {
+            background-color: #4a4a6a; /* Accent color */
+            color: #dcdce0;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        nav button.active, .button.active {
+            background-color: #8a8aff; /* Highlight for active tab */
+            color: #1e1e2f;
+        }
+        nav button:hover, .button:hover, button:hover {
+            background-color: #6a6a8a;
+        }
+        nav button:active, .button:active, button:active {
+            transform: translateY(1px);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #b0b0cc; /* Lighter text for labels */
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="search"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a3e;
+            border: 1px solid #4a4a6a;
+            color: #dcdce0;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .form-group input[type="text"]:focus,
+        .form-group input[type="search"]:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #8a8aff;
+            box-shadow: 0 0 5px #8a8aff33;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background-color: #252538; /* Slightly different dark shade for content cards */
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .content-section h2 {
+            color: #8a8aff;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #4a4a6a;
+            padding-bottom: 10px;
+        }
+
+        /* Lists (Issues, Rulings) */
+        .item-list {
+            list-style: none;
+        }
+        .item-list li {
+            background-color: #2a2a3e;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #4a4a6a;
+            transition: background-color 0.2s;
+        }
+        .item-list li:hover {
+            background-color: #3a3a4e;
+        }
+        .item-list li h3 {
+            color: #c0c0e0;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .item-list li p {
+            font-size: 0.9em;
+            color: #a0a0b8;
+            margin-bottom: 3px;
+        }
+        .item-list .actions button {
+            margin-left: 5px;
+            padding: 5px 8px;
+            font-size: 0.8em;
+        }
+
+        /* Issue Detail View */
+        .issue-detail-header {
+            margin-bottom: 20px;
+        }
+        .issue-detail-header h2 { /* Question */
+            font-size: 1.8em;
+            color: #9f9fff;
+        }
+        .tags-container span.tag, .related-issue-item span.tag {
+            background-color: #4a4a6a;
+            color: #dcdce0;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+        .related-issue-item span.tag {
+            cursor: pointer;
+        }
+        .related-issue-item span.tag:hover {
+            background-color: #6a6a8a;
+        }
+
+        /* Comparison Table */
+        .comparison-table-container {
+            overflow-x: auto; /* For responsiveness on small screens */
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #4a4a6a;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top; /* Important for long content */
+        }
+        .comparison-table th {
+            background-color: #3a3a4e;
+            color: #c0c0e0;
+            font-weight: bold;
+        }
+        .comparison-table td {
+            background-color: #2a2a3e;
+        }
+        .comparison-table td pre { /* For evidence/reasoning */
+            white-space: pre-wrap; /* Preserve formatting */
+            word-wrap: break-word;
+            font-family: inherit; /* Use body font or specific content font */
+            font-size: 0.95em;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+        }
+        .modal-content {
+            background-color: #252538;
+            margin: 10% auto;
+            padding: 25px;
+            border: 1px solid #4a4a6a;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .modal-content h2 { color: #8a8aff; margin-bottom: 20px; }
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover, .close-button:focus {
+            color: #dcdce0;
+            text-decoration: none;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background-color: #3e3e52;
+            color: #f0e0e0; /* Slightly warmer text for emphasis */
+            padding: 15px;
+            margin: 20px auto;
+            border-radius: 5px;
+            border: 1px solid #c06060; /* Warning-like border */
+            text-align: justify;
+            font-size: 0.9em;
+            max-width: 90%;
+        }
+        .disclaimer h4 { margin-bottom: 10px; color: #ff8080; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 15px 0;
+            font-size: 0.9em;
+            color: #77778b;
+            border-top: 1px solid #2a2a3e;
+            margin-top: auto; /* Pushes footer to bottom */
+        }
+
+        /* Utility classes */
+        .hidden { display: none !important; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+
+        /* SVG Icons in buttons */
+        button svg {
+            width: 1em;
+            height: 1em;
+            fill: currentColor;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body { font-size: 15px; }
+            header h1 { font-size: 1.8em; }
+            nav { flex-direction: column; align-items: stretch; }
+            nav button { width: 100%; margin-bottom: 5px; }
+            .modal-content { width: 95%; margin: 5% auto; }
+            .comparison-table th, .comparison-table td { padding: 8px; font-size: 0.9em; }
+            .content-section { padding: 15px; }
+        }
+        @media (max-width: 480px) {
+            body { font-size: 14px; }
+            header h1 { font-size: 1.5em; }
+            .button, button { padding: 8px 12px; font-size: 0.9em; }
+            .item-list li { padding: 10px; }
+        }
+svg {
+    width: 17px;
+    height: 15px;
+    color: white !important;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>FiqhCompare Studio</h1>
+        <p class="author-tag">by Yasin Ullah (Pakistani)</p>
+        <div class="container">
+            <nav>
+                <button id="nav-issues">
+                    <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+                    Issues
+                </button>
+                <button id="nav-search">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    Search
+                </button>
+                <button id="nav-summaries-list">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    Summaries
+                </button>
+                <button id="nav-backup-restore">
+                    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                    Backup/Restore
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Disclaimer (always visible or toggleable) -->
+        <div id="disclaimer-section" class="disclaimer">
+            <h4><svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; vertical-align:middle; margin-right:5px;"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>Disclaimer</h4>
+            <p>FiqhCompare Studio is a personal research tool for academic comparison of Fiqh rulings based on your own notes. It is NOT intended for deriving personal Fiqh (fatwas). Users are solely responsible for the accuracy and sources of their entered data. Consult qualified scholars for personal religious guidance.</p>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div id="app-content">
+            <!-- Content will be rendered here by JavaScript -->
+        </div>
+    </main>
+
+    <footer>
+        <p>© <span id="currentYear"></span> FiqhCompare Studio by Yasin Ullah. For personal academic use.</p>
+    </footer>
+
+    <!-- Modal Structure -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="modal-close-button">×</span>
+            <h2 id="modal-title">Modal Title</h2>
+            <div id="modal-body">
+                <!-- Modal form/content will be injected here -->
+            </div>
+            <div id="modal-footer" style="text-align: right; margin-top: 20px;">
+                <button id="modal-save-button" class="button">Save</button>
+                <button id="modal-cancel-button" class="button" style="background-color: #757575;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Area -->
+    <div id="notification-area" style="position: fixed; bottom: 20px; right: 20px; z-index: 2000;"></div>
+
+    <script>
+        const FiqhCompareStudio = {
+            db: null,
+            DB_NAME: 'FiqhCompareDB',
+            DB_VERSION: 1,
+            STORE_ISSUES: 'issues',
+            STORE_RULINGS: 'rulings',
+            STORE_SUMMARIES: 'summaries',
+
+            // SVG Icons
+            icons: {
+                add: '<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>',
+                edit: '<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
+                delete: '<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
+                link: '<svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>',
+                summary: '<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-2 14H8v-2h4v2zm0-3H8V9h4v4zm2-5.5V3.5L18.5 9H14z"/></svg>',
+                compare: '<svg viewBox="0 0 24 24"><path d="M10 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h5v2h2V1h-2v2zm0 15H5l5-6v6zm9-15h-5v2h5v13l-5-6v9h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>',
+                tag: '<svg viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>'
+            },
+
+            // App State
+            state: {
+                currentView: 'issuesList',
+                selectedIssueId: null,
+                editingItemId: null, // For editing rulings or summaries
+                currentModalAction: null, // e.g., 'addIssue', 'editRuling'
+                searchTerm: '',
+                filterTags: [],
+            },
+
+            init: async function() {
+                document.getElementById('currentYear').textContent = new Date().getFullYear();
+                this.setupEventListeners();
+                try {
+                    await this.openDB();
+                    this.navigateTo('issuesList');
+                } catch (error) {
+                    console.error("Initialization failed:", error);
+                    this.showNotification("Error initializing application. Please refresh.", "error");
+                }
+            },
+
+            openDB: function() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+
+                    request.onupgradeneeded = (event) => {
+                        this.db = event.target.result;
+                        if (!this.db.objectStoreNames.contains(this.STORE_ISSUES)) {
+                            const issueStore = this.db.createObjectStore(this.STORE_ISSUES, { keyPath: 'id', autoIncrement: true });
+                            issueStore.createIndex('question', 'question', { unique: false }); // Questions might not be unique if user re-enters
+                            issueStore.createIndex('tags', 'tags', { multiEntry: true });
+                        }
+                        if (!this.db.objectStoreNames.contains(this.STORE_RULINGS)) {
+                            const rulingStore = this.db.createObjectStore(this.STORE_RULINGS, { keyPath: 'id', autoIncrement: true });
+                            rulingStore.createIndex('issueId', 'issueId', { unique: false });
+                            rulingStore.createIndex('madhhabScholar', 'madhhabScholar', { unique: false });
+                        }
+                        if (!this.db.objectStoreNames.contains(this.STORE_SUMMARIES)) {
+                            const summaryStore = this.db.createObjectStore(this.STORE_SUMMARIES, { keyPath: 'id', autoIncrement: true });
+                            summaryStore.createIndex('issueId', 'issueId', { unique: false });
+                            summaryStore.createIndex('title', 'title', { unique: false });
+                        }
+                        this.showNotification("Database upgraded/created.", "success");
+                    };
+
+                    request.onsuccess = (event) => {
+                        this.db = event.target.result;
+                        resolve();
+                    };
+
+                    request.onerror = (event) => {
+                        console.error("IndexedDB error:", event.target.error);
+                        reject(event.target.error);
+                    };
+                });
+            },
+
+            setupEventListeners: function() {
+                document.getElementById('nav-issues').addEventListener('click', () => this.navigateTo('issuesList'));
+                document.getElementById('nav-search').addEventListener('click', () => this.navigateTo('searchView'));
+                document.getElementById('nav-summaries-list').addEventListener('click', () => this.navigateTo('summariesList'));
+                document.getElementById('nav-backup-restore').addEventListener('click', () => this.navigateTo('backupRestoreView'));
+
+                document.getElementById('modal-close-button').addEventListener('click', () => this.hideModal());
+                document.getElementById('modal-cancel-button').addEventListener('click', () => this.hideModal());
+                document.getElementById('modal-save-button').addEventListener('click', () => this.handleModalSave());
+
+                // Event delegation for dynamically created elements
+                document.getElementById('app-content').addEventListener('click', (event) => {
+                    const target = event.target.closest('button[data-action], h3[data-issue-id], span.tag[data-issue-id]');
+                    if (!target) return;
+
+                    const action = target.dataset.action;
+                    const id = parseInt(target.dataset.id);
+                    const issueId = parseInt(target.dataset.issueId);
+
+                    if (target.matches('h3[data-issue-id]')) { // Click on issue title
+                        this.navigateTo('issueDetail', issueId);
+                    } else if (target.matches('span.tag[data-issue-id]')) { // Click on related issue tag
+                        this.navigateTo('issueDetail', parseInt(target.dataset.issueId));
+                    } else if (action) {
+                        switch (action) {
+                            case 'add-issue': this.showIssueForm(); break;
+                            case 'edit-issue': this.showIssueForm(id); break;
+                            case 'delete-issue': this.confirmDeleteIssue(id); break;
+                            case 'add-ruling': this.showRulingForm(this.state.selectedIssueId); break;
+                            case 'edit-ruling': this.showRulingForm(this.state.selectedIssueId, id); break;
+                            case 'delete-ruling': this.confirmDeleteRuling(id); break;
+                            case 'add-summary': this.showSummaryForm(this.state.selectedIssueId); break;
+                            case 'edit-summary': this.showSummaryForm(this.state.selectedIssueId, id); break;
+                            case 'delete-summary': this.confirmDeleteSummary(id); break;
+                            case 'manage-related-issues': this.showRelatedIssuesForm(this.state.selectedIssueId); break;
+                            case 'view-comparison': this.renderComparisonView(this.state.selectedIssueId); break;
+                        }
+                    }
+                });
+            },
+
+            navigateTo: function(view, id = null) {
+                this.state.currentView = view;
+                this.state.selectedIssueId = (view === 'issueDetail' || view === 'comparisonView') ? id : null;
+                this.state.editingItemId = null;
+                this.render();
+                
+                // Update active nav button
+                document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+                let activeBtnId = '';
+                if (view === 'issuesList' || view === 'issueDetail' || view === 'comparisonView') activeBtnId = 'nav-issues';
+                else if (view === 'searchView') activeBtnId = 'nav-search';
+                else if (view === 'summariesList') activeBtnId = 'nav-summaries-list';
+                else if (view === 'backupRestoreView') activeBtnId = 'nav-backup-restore';
+                if (activeBtnId) document.getElementById(activeBtnId)?.classList.add('active');
+            },
+
+            render: async function() {
+                const appContent = document.getElementById('app-content');
+                appContent.innerHTML = ''; // Clear previous content
+
+                switch (this.state.currentView) {
+                    case 'issuesList':
+                        appContent.innerHTML = await this.getIssuesListView();
+                        break;
+                    case 'issueDetail':
+                        if (this.state.selectedIssueId) {
+                            appContent.innerHTML = await this.getIssueDetailView(this.state.selectedIssueId);
+                        } else {
+                            this.navigateTo('issuesList'); // Fallback
+                        }
+                        break;
+                    case 'searchView':
+                        appContent.innerHTML = this.getSearchView();
+                        this.performSearch(); // Render initial empty search or based on stored term
+                        break;
+                    case 'summariesList':
+                        appContent.innerHTML = await this.getSummariesListView();
+                        break;
+                    case 'backupRestoreView':
+                        appContent.innerHTML = this.getBackupRestoreView();
+                        break;
+                    case 'comparisonView': // This is part of issueDetail view, handled there.
+                         if (this.state.selectedIssueId) {
+                            appContent.innerHTML = await this.getIssueDetailView(this.state.selectedIssueId, true); // Pass true to show comparison
+                        } else {
+                            this.navigateTo('issuesList');
+                        }
+                        break;
+                    default:
+                        appContent.innerHTML = `<h2>Page not found</h2>`;
+                }
+            },
+
+            // --- View Generators ---
+            getIssuesListView: async function() {
+                const issues = await this.getAllItems(this.STORE_ISSUES);
+                let listHtml = issues.map(issue => `
+                    <li>
+                        <h3 data-issue-id="${issue.id}">${this.escapeHtml(issue.question)}</h3>
+                        <p>Tags: ${issue.tags && issue.tags.length > 0 ? issue.tags.map(t => `<span class="tag">${this.escapeHtml(t)}</span>`).join(' ') : 'None'}</p>
+                        <div class="actions">
+                            <button class="button" data-action="edit-issue" data-id="${issue.id}">${this.icons.edit} Edit</button>
+                            <button class="button" data-action="delete-issue" data-id="${issue.id}" style="background-color:#c06060;">${this.icons.delete} Delete</button>
+                        </div>
+                    </li>
+                `).join('');
+
+                return `
+                    <div class="content-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2>Fiqh Issues</h2>
+                            <button class="button" data-action="add-issue">${this.icons.add} Add New Issue</button>
+                        </div>
+                        ${issues.length > 0 ? `<ul class="item-list">${listHtml}</ul>` : '<p>No issues found. Click "Add New Issue" to start.</p>'}
+                    </div>
+                `;
+            },
+
+            getIssueDetailView: async function(issueId, showComparison = false) {
+                const issue = await this.getItemById(this.STORE_ISSUES, issueId);
+                if (!issue) return `<p>Issue not found.</p>`;
+
+                const rulings = await this.getRulingsForIssue(issueId);
+                const summary = await this.getSummaryForIssue(issueId);
+
+                let rulingsHtml = rulings.map(ruling => `
+                    <li id="ruling-${ruling.id}">
+                        <h3>${this.escapeHtml(ruling.madhhabScholar)}</h3>
+                        <p><strong>Ruling:</strong> ${this.escapeHtml(ruling.rulingText)}</p>
+                        <p><strong>Primary Evidence:</strong></p>
+                        <pre class="arabic-urdu-text" dir="auto">${this.escapeHtml(ruling.primaryEvidence)}</pre>
+                        <p><strong>Reasoning:</strong></p>
+                        <pre dir="auto">${this.escapeHtml(ruling.reasoning)}</pre>
+                        <div class="actions">
+                            <button class="button" data-action="edit-ruling" data-id="${ruling.id}">${this.icons.edit} Edit Ruling</button>
+                            <button class="button" data-action="delete-ruling" data-id="${ruling.id}" style="background-color:#c06060;">${this.icons.delete} Delete Ruling</button>
+                        </div>
+                    </li>
+                `).join('');
+
+                const relatedIssuesDetails = await Promise.all(
+                    (issue.relatedIssueIds || []).map(id => this.getItemById(this.STORE_ISSUES, id))
+                );
+                const relatedIssuesHtml = relatedIssuesDetails
+                    .filter(Boolean) // Filter out null if an ID is invalid
+                    .map(relIssue => `<span class="tag" data-issue-id="${relIssue.id}" title="View issue: ${this.escapeHtml(relIssue.question)}">${this.icons.link} ${this.escapeHtml(relIssue.question.substring(0,30))}...</span>`)
+                    .join(' ');
+
+                let summaryHtml = '';
+                if (summary) {
+                    summaryHtml = `
+                        <div class="content-section">
+                            <h3>Personal Summary: ${this.escapeHtml(summary.title)}</h3>
+                            <pre dir="auto">${this.escapeHtml(summary.summaryText)}</pre>
+                            <div class="actions mt-1">
+                                <button class="button" data-action="edit-summary" data-id="${summary.id}">${this.icons.edit} Edit Summary</button>
+                                <button class="button" data-action="delete-summary" data-id="${summary.id}" style="background-color:#c06060;">${this.icons.delete} Delete Summary</button>
+                            </div>
+                        </div>`;
+                } else {
+                    summaryHtml = `<button class="button" data-action="add-summary">${this.icons.summary} Add Personal Summary</button>`;
+                }
+                
+                const comparisonTableHtml = showComparison ? await this.getComparisonTableView(issueId) : '';
+
+                return `
+                    <div class="content-section">
+                        <div class="issue-detail-header">
+                            <h2>${this.escapeHtml(issue.question)}</h2>
+                            <p><strong>Tags:</strong> ${issue.tags && issue.tags.length > 0 ? issue.tags.map(t => `<span class="tag">${this.icons.tag} ${this.escapeHtml(t)}</span>`).join(' ') : 'None'}</p>
+                            <p><strong>Related Issues:</strong> ${relatedIssuesHtml || 'None'} 
+                                <button class="button" data-action="manage-related-issues" title="Manage Linked Issues">${this.icons.link}</button>
+                            </p>
+                            <div class="actions mt-1">
+                                <button class="button" data-action="edit-issue" data-id="${issue.id}">${this.icons.edit} Edit Issue Details</button>
+                                <button class="button" data-action="view-comparison" ${showComparison ? 'class="active"' : ''}>${this.icons.compare} ${showComparison ? 'Hide' : 'Show'} Comparison</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${showComparison ? comparisonTableHtml : ''}
+                    
+                    <div class="content-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2>Rulings</h2>
+                            <button class="button" data-action="add-ruling">${this.icons.add} Add Ruling</button>
+                        </div>
+                        ${rulings.length > 0 ? `<ul class="item-list">${rulingsHtml}</ul>` : '<p>No rulings added for this issue yet.</p>'}
+                    </div>
+
+                    <div class="content-section">
+                        <h2>Personal Summary</h2>
+                        ${summaryHtml}
+                    </div>
+                `;
+            },
+            
+            getComparisonTableView: async function(issueId) {
+                const rulings = await this.getRulingsForIssue(issueId);
+                if (rulings.length === 0) {
+                    return '<div class="content-section"><p>No rulings to compare for this issue.</p></div>';
+                }
+
+                let tableHtml = `
+                    <div class="content-section">
+                        <h2>Side-by-Side Comparison</h2>
+                        <div class="comparison-table-container">
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>Aspect</th>
+                                        ${rulings.map(r => `<th>${this.escapeHtml(r.madhhabScholar)}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Ruling</strong></td>
+                                        ${rulings.map(r => `<td>${this.escapeHtml(r.rulingText)}</td>`).join('')}
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Primary Evidence</strong></td>
+                                        ${rulings.map(r => `<td><pre class="arabic-urdu-text" dir="auto">${this.escapeHtml(r.primaryEvidence)}</pre></td>`).join('')}
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Reasoning</strong></td>
+                                        ${rulings.map(r => `<td><pre dir="auto">${this.escapeHtml(r.reasoning)}</pre></td>`).join('')}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`;
+                return tableHtml;
+            },
+
+            getSearchView: function() {
+                return `
+                    <div class="content-section">
+                        <h2>Search</h2>
+                        <div class="form-group">
+                            <label for="search-term">Search Term (Issue Question, Madhhab, Evidence Keyword)</label>
+                            <input type="search" id="search-term" placeholder="Enter search term...">
+                        </div>
+                        <div class="form-group">
+                            <label for="search-tags">Filter by Tags (comma-separated)</label>
+                            <input type="text" id="search-tags" placeholder="e.g., Ibadat, Salah">
+                        </div>
+                        <button id="search-button" class="button">Search</button>
+                    </div>
+                    <div id="search-results" class="content-section">
+                        <h3>Results</h3>
+                        <p>Enter search criteria and click Search.</p>
+                    </div>
+                `;
+            },
+            
+            getSummariesListView: async function() {
+                const summaries = await this.getAllItems(this.STORE_SUMMARIES);
+                let listHtml = '';
+
+                if (summaries.length > 0) {
+                    for (const summary of summaries) {
+                        const issue = await this.getItemById(this.STORE_ISSUES, summary.issueId);
+                        const issueQuestion = issue ? this.escapeHtml(issue.question) : 'General Summary (No specific issue linked)';
+                        listHtml += `
+                            <li>
+                                <h3>${this.escapeHtml(summary.title)}</h3>
+                                <p><strong>For Issue:</strong> <span style="cursor:pointer; text-decoration:underline;" data-issue-id="${summary.issueId}">${issueQuestion}</span></p>
+                                <pre dir="auto">${this.escapeHtml(summary.summaryText.substring(0, 200))}...</pre>
+                                <div class="actions">
+                                    <button class="button" data-action="edit-summary" data-id="${summary.id}">${this.icons.edit} Edit</button>
+                                    <button class="button" data-action="delete-summary" data-id="${summary.id}" style="background-color:#c06060;">${this.icons.delete} Delete</button>
+                                </div>
+                            </li>
+                        `;
+                    }
+                }
+
+                return `
+                    <div class="content-section">
+                        <h2>All Personal Summaries</h2>
+                        ${summaries.length > 0 ? `<ul class="item-list">${listHtml}</ul>` : '<p>No summaries found.</p>'}
+                    </div>
+                `;
+            },
+
+            getBackupRestoreView: function() {
+                return `
+                    <div class="content-section">
+                        <h2>Backup and Restore</h2>
+                        <p>Backup your data to a JSON file or restore from a previously saved backup.</p>
+                        
+                        <div class="mt-2">
+                            <h4>Backup</h4>
+                            <button id="backup-button" class="button">${this.icons.add} Create Backup File</button>
+                        </div>
+
+                        <div class="mt-2">
+                            <h4>Restore</h4>
+                            <p><strong>Warning:</strong> Restoring will overwrite all current data.</p>
+                            <div class="form-group">
+                                <label for="restore-file">Select Backup File (JSON)</label>
+                                <input type="file" id="restore-file" accept=".json" style="color: #dcdce0; padding: 5px; background-color: #4a4a6a; border-radius: 4px;">
+                            </div>
+                            <button id="restore-button" class="button" style="background-color:#c06060;">Restore Data</button>
+                        </div>
+                    </div>
+                `;
+            },
+
+            // --- Modal and Form Handlers ---
+            showModal: function(title, bodyHtml, showSave = true, saveButtonText = "Save") {
+                document.getElementById('modal-title').textContent = title;
+                document.getElementById('modal-body').innerHTML = bodyHtml;
+                document.getElementById('modal-save-button').style.display = showSave ? 'inline-block' : 'none';
+                document.getElementById('modal-save-button').textContent = saveButtonText;
+                document.getElementById('modal').style.display = 'block';
+            },
+
+            hideModal: function() {
+                document.getElementById('modal').style.display = 'none';
+                document.getElementById('modal-body').innerHTML = ''; // Clear content
+                this.state.editingItemId = null;
+                this.state.currentModalAction = null;
+            },
+
+            handleModalSave: async function() {
+                const action = this.state.currentModalAction;
+                try {
+                    switch (action) {
+                        case 'addIssue':
+                        case 'editIssue':
+                            await this.saveIssue();
+                            break;
+                        case 'addRuling':
+                        case 'editRuling':
+                            await this.saveRuling();
+                            break;
+                        case 'addSummary':
+                        case 'editSummary':
+                            await this.saveSummary();
+                            break;
+                        case 'manageRelatedIssues':
+                            await this.saveRelatedIssues();
+                            break;
+                    }
+                    this.hideModal();
+                    this.render(); // Re-render current view
+                } catch (error) {
+                    console.error("Error saving data:", error);
+                    this.showNotification(`Error: ${error.message || 'Could not save data.'}`, "error");
+                }
+            },
+
+            showIssueForm: async function(issueId = null) {
+                this.state.currentModalAction = issueId ? 'editIssue' : 'addIssue';
+                this.state.editingItemId = issueId;
+                let issue = { question: '', tags: '' };
+                if (issueId) {
+                    issue = await this.getItemById(this.STORE_ISSUES, issueId);
+                    issue.tags = issue.tags ? issue.tags.join(', ') : ''; // Convert array to comma-separated string for input
+                }
+                const formHtml = `
+                    <div class="form-group">
+                        <label for="issue-question">Fiqh Issue/Question:</label>
+                        <textarea id="issue-question" dir="auto" required>${this.escapeHtml(issue.question)}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="issue-tags">Tags (comma-separated, e.g., Ibadat, Muamalat, Salah):</label>
+                        <input type="text" id="issue-tags" value="${this.escapeHtml(issue.tags)}">
+                    </div>
+                `;
+                this.showModal(issueId ? 'Edit Issue' : 'Add New Issue', formHtml);
+            },
+
+            saveIssue: async function() {
+                const question = document.getElementById('issue-question').value.trim();
+                const tagsString = document.getElementById('issue-tags').value.trim();
+                if (!question) {
+                    this.showNotification("Issue question cannot be empty.", "error");
+                    return;
+                }
+                const tags = tagsString ? tagsString.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
+                
+                const issueData = {
+                    question,
+                    tags,
+                    updatedAt: new Date().toISOString()
+                };
+
+                if (this.state.editingItemId) { // Editing existing issue
+                    issueData.id = this.state.editingItemId;
+                    const existingIssue = await this.getItemById(this.STORE_ISSUES, this.state.editingItemId);
+                    issueData.createdAt = existingIssue.createdAt; // Preserve original creation date
+                    issueData.relatedIssueIds = existingIssue.relatedIssueIds || []; // Preserve related issues
+                    await this.updateItem(this.STORE_ISSUES, issueData);
+                    this.showNotification("Issue updated successfully.", "success");
+                } else { // Adding new issue
+                    issueData.createdAt = new Date().toISOString();
+                    issueData.relatedIssueIds = [];
+                    await this.addItem(this.STORE_ISSUES, issueData);
+                    this.showNotification("Issue added successfully.", "success");
+                }
+            },
+            
+            confirmDeleteIssue: async function(issueId) {
+                if (confirm("Are you sure you want to delete this issue and all its related rulings and summaries? This action cannot be undone.")) {
+                    try {
+                        // 1. Delete associated rulings
+                        const rulings = await this.getRulingsForIssue(issueId);
+                        for (const ruling of rulings) {
+                            await this.deleteItem(this.STORE_RULINGS, ruling.id);
+                        }
+                        // 2. Delete associated summary
+                        const summary = await this.getSummaryForIssue(issueId);
+                        if (summary) {
+                            await this.deleteItem(this.STORE_SUMMARIES, summary.id);
+                        }
+                        // 3. Remove this issue from other issues' relatedIssueIds lists
+                        const allIssues = await this.getAllItems(this.STORE_ISSUES);
+                        for (const issue of allIssues) {
+                            if (issue.relatedIssueIds && issue.relatedIssueIds.includes(issueId)) {
+                                issue.relatedIssueIds = issue.relatedIssueIds.filter(id => id !== issueId);
+                                await this.updateItem(this.STORE_ISSUES, issue);
+                            }
+                        }
+                        // 4. Delete the issue itself
+                        await this.deleteItem(this.STORE_ISSUES, issueId);
+                        
+                        this.showNotification("Issue and related data deleted successfully.", "success");
+                        if (this.state.selectedIssueId === issueId) { // If currently viewing this issue
+                            this.navigateTo('issuesList');
+                        } else {
+                            this.render(); // Re-render current view
+                        }
+                    } catch (error) {
+                        console.error("Error deleting issue:", error);
+                        this.showNotification("Error deleting issue.", "error");
+                    }
+                }
+            },
+
+            showRulingForm: async function(issueId, rulingId = null) {
+                this.state.currentModalAction = rulingId ? 'editRuling' : 'addRuling';
+                this.state.editingItemId = rulingId; // Store rulingId if editing
+                let ruling = { madhhabScholar: '', rulingText: '', primaryEvidence: '', reasoning: '' };
+                if (rulingId) {
+                    ruling = await this.getItemById(this.STORE_RULINGS, rulingId);
+                }
+                const formHtml = `
+                    <input type="hidden" id="ruling-issue-id" value="${issueId}">
+                    <div class="form-group">
+                        <label for="ruling-madhhab">Madhhab/Scholar:</label>
+                        <input type="text" id="ruling-madhhab" value="${this.escapeHtml(ruling.madhhabScholar)}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ruling-text">Ruling:</label>
+                        <textarea id="ruling-text" dir="auto" required>${this.escapeHtml(ruling.rulingText)}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="ruling-evidence">Primary Evidence (Quran/Sunnah references - text):</label>
+                        <textarea id="ruling-evidence" class="arabic-urdu-text" dir="auto" data-lang="ar">${this.escapeHtml(ruling.primaryEvidence)}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="ruling-reasoning">Reasoning (User's summary of scholarly arguments):</label>
+                        <textarea id="ruling-reasoning" dir="auto">${this.escapeHtml(ruling.reasoning)}</textarea>
+                    </div>
+                `;
+                this.showModal(rulingId ? 'Edit Ruling' : 'Add Ruling', formHtml);
+            },
+
+            saveRuling: async function() {
+                const issueId = parseInt(document.getElementById('ruling-issue-id').value);
+                const madhhabScholar = document.getElementById('ruling-madhhab').value.trim();
+                const rulingText = document.getElementById('ruling-text').value.trim();
+                const primaryEvidence = document.getElementById('ruling-evidence').value.trim();
+                const reasoning = document.getElementById('ruling-reasoning').value.trim();
+
+                if (!madhhabScholar || !rulingText) {
+                    this.showNotification("Madhhab/Scholar and Ruling text cannot be empty.", "error");
+                    return;
+                }
+
+                const rulingData = {
+                    issueId,
+                    madhhabScholar,
+                    rulingText,
+                    primaryEvidence,
+                    reasoning,
+                    updatedAt: new Date().toISOString()
+                };
+
+                if (this.state.editingItemId) { // Editing existing ruling
+                    rulingData.id = this.state.editingItemId;
+                    const existingRuling = await this.getItemById(this.STORE_RULINGS, this.state.editingItemId);
+                    rulingData.createdAt = existingRuling.createdAt;
+                    await this.updateItem(this.STORE_RULINGS, rulingData);
+                    this.showNotification("Ruling updated successfully.", "success");
+                } else { // Adding new ruling
+                    rulingData.createdAt = new Date().toISOString();
+                    await this.addItem(this.STORE_RULINGS, rulingData);
+                    this.showNotification("Ruling added successfully.", "success");
+                }
+            },
+            
+            confirmDeleteRuling: async function(rulingId) {
+                if (confirm("Are you sure you want to delete this ruling? This action cannot be undone.")) {
+                    try {
+                        await this.deleteItem(this.STORE_RULINGS, rulingId);
+                        this.showNotification("Ruling deleted successfully.", "success");
+                        this.render(); // Re-render current view (likely issueDetail)
+                    } catch (error) {
+                        console.error("Error deleting ruling:", error);
+                        this.showNotification("Error deleting ruling.", "error");
+                    }
+                }
+            },
+
+            showSummaryForm: async function(issueId, summaryId = null) {
+                this.state.currentModalAction = summaryId ? 'editSummary' : 'addSummary';
+                this.state.editingItemId = summaryId;
+                let summary = { title: '', summaryText: '' };
+                if (summaryId) {
+                    summary = await this.getItemById(this.STORE_SUMMARIES, summaryId);
+                }
+                const formHtml = `
+                    <input type="hidden" id="summary-issue-id" value="${issueId}">
+                    <div class="form-group">
+                        <label for="summary-title">Summary Title:</label>
+                        <input type="text" id="summary-title" value="${this.escapeHtml(summary.title)}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="summary-text">Summary Text:</label>
+                        <textarea id="summary-text" dir="auto" required>${this.escapeHtml(summary.summaryText)}</textarea>
+                    </div>
+                `;
+                this.showModal(summaryId ? 'Edit Summary' : 'Add Personal Summary', formHtml);
+            },
+
+            saveSummary: async function() {
+                const issueId = parseInt(document.getElementById('summary-issue-id').value);
+                const title = document.getElementById('summary-title').value.trim();
+                const summaryText = document.getElementById('summary-text').value.trim();
+
+                if (!title || !summaryText) {
+                    this.showNotification("Title and Summary text cannot be empty.", "error");
+                    return;
+                }
+
+                const summaryData = {
+                    issueId,
+                    title,
+                    summaryText,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                if (this.state.editingItemId) { // Editing existing summary
+                    summaryData.id = this.state.editingItemId;
+                    const existingSummary = await this.getItemById(this.STORE_SUMMARIES, this.state.editingItemId);
+                    summaryData.createdAt = existingSummary.createdAt;
+                    await this.updateItem(this.STORE_SUMMARIES, summaryData);
+                    this.showNotification("Summary updated successfully.", "success");
+                } else { // Adding new summary
+                    // Check if a summary already exists for this issueId
+                    const existingSummaryForIssue = await this.getSummaryForIssue(issueId);
+                    if (existingSummaryForIssue) {
+                        this.showNotification("A summary already exists for this issue. You can edit the existing one.", "error");
+                        return;
+                    }
+                    summaryData.createdAt = new Date().toISOString();
+                    await this.addItem(this.STORE_SUMMARIES, summaryData);
+                    this.showNotification("Summary added successfully.", "success");
+                }
+            },
+
+            confirmDeleteSummary: async function(summaryId) {
+                if (confirm("Are you sure you want to delete this summary? This action cannot be undone.")) {
+                    try {
+                        await this.deleteItem(this.STORE_SUMMARIES, summaryId);
+                        this.showNotification("Summary deleted successfully.", "success");
+                        this.render();
+                    } catch (error) {
+                        console.error("Error deleting summary:", error);
+                        this.showNotification("Error deleting summary.", "error");
+                    }
+                }
+            },
+
+            showRelatedIssuesForm: async function(currentIssueId) {
+                this.state.currentModalAction = 'manageRelatedIssues';
+                this.state.editingItemId = currentIssueId; // The issue we are managing relations for
+
+                const currentIssue = await this.getItemById(this.STORE_ISSUES, currentIssueId);
+                const allIssues = (await this.getAllItems(this.STORE_ISSUES)).filter(issue => issue.id !== currentIssueId);
+                
+                let optionsHtml = allIssues.map(issue => {
+                    const isSelected = currentIssue.relatedIssueIds && currentIssue.relatedIssueIds.includes(issue.id);
+                    return `<label><input type="checkbox" name="related-issue" value="${issue.id}" ${isSelected ? 'checked' : ''}> ${this.escapeHtml(issue.question)}</label><br>`;
+                }).join('');
+
+                if (allIssues.length === 0) {
+                    optionsHtml = "<p>No other issues available to link.</p>";
+                }
+
+                const formHtml = `
+                    <p>Select issues to link with "${this.escapeHtml(currentIssue.question)}":</p>
+                    <div style="max-height: 300px; overflow-y: auto; border: 1px solid #4a4a6a; padding: 10px; margin-top:10px;">
+                        ${optionsHtml}
+                    </div>
+                `;
+                this.showModal('Manage Related Issues', formHtml);
+            },
+
+            saveRelatedIssues: async function() {
+                const currentIssueId = this.state.editingItemId;
+                const currentIssue = await this.getItemById(this.STORE_ISSUES, currentIssueId);
+                
+                const selectedCheckboxes = document.querySelectorAll('input[name="related-issue"]:checked');
+                const selectedIssueIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
+
+                currentIssue.relatedIssueIds = selectedIssueIds;
+                currentIssue.updatedAt = new Date().toISOString();
+
+                await this.updateItem(this.STORE_ISSUES, currentIssue);
+                this.showNotification("Related issues updated.", "success");
+            },
+
+            // --- Search Functionality ---
+            performSearch: async function() {
+                const searchTerm = document.getElementById('search-term')?.value.toLowerCase() || this.state.searchTerm;
+                const tagsFilterString = document.getElementById('search-tags')?.value || (this.state.filterTags.join(','));
+                const filterTags = tagsFilterString.split(',').map(t => t.trim().toLowerCase()).filter(t => t);
+                
+                this.state.searchTerm = searchTerm; // Store for re-rendering if needed
+                this.state.filterTags = filterTags;
+
+                const resultsContainer = document.getElementById('search-results');
+                if (!resultsContainer) return; // Not on search view
+
+                resultsContainer.innerHTML = '<h3>Results</h3><p>Searching...</p>';
+
+                let allIssues = await this.getAllItems(this.STORE_ISSUES);
+                let allRulings = await this.getAllItems(this.STORE_RULINGS);
+                
+                let matchedIssueIds = new Set();
+                let resultsHtml = '';
+
+                // Filter issues
+                allIssues.forEach(issue => {
+                    let match = false;
+                    if (searchTerm && issue.question.toLowerCase().includes(searchTerm)) {
+                        match = true;
+                    }
+                    if (filterTags.length > 0) {
+                        const issueTagsLower = issue.tags ? issue.tags.map(t => t.toLowerCase()) : [];
+                        if (!filterTags.every(ft => issueTagsLower.includes(ft))) {
+                            match = false; // If tag filter applied and doesn't match, then no match overall for this issue by tag
+                        } else if (!searchTerm) { // If only tag filter is active
+                             match = true;
+                        }
+                    } else if (!searchTerm && filterTags.length === 0) { // No search criteria
+                        match = true; // Show all issues if no criteria
+                    }
+
+
+                    if (match) {
+                        matchedIssueIds.add(issue.id);
+                    }
+                });
+
+                // Filter rulings (and add their issue IDs to results if not already there)
+                if (searchTerm) {
+                    allRulings.forEach(ruling => {
+                        if (ruling.madhhabScholar.toLowerCase().includes(searchTerm) ||
+                            ruling.primaryEvidence.toLowerCase().includes(searchTerm) ||
+                            ruling.rulingText.toLowerCase().includes(searchTerm) ||
+                            ruling.reasoning.toLowerCase().includes(searchTerm)) {
+                            matchedIssueIds.add(ruling.issueId);
+                        }
+                    });
+                }
+                
+                if (matchedIssueIds.size > 0) {
+                    resultsHtml += '<ul class="item-list">';
+                    for (const issueId of matchedIssueIds) {
+                        const issue = await this.getItemById(this.STORE_ISSUES, issueId);
+                        if (issue) { // Ensure issue exists (it should)
+                             // Apply tag filter again if it was the primary reason for match or if both searchterm and tags were used
+                            let displayIssue = true;
+                            if (filterTags.length > 0) {
+                                const issueTagsLower = issue.tags ? issue.tags.map(t => t.toLowerCase()) : [];
+                                if (!filterTags.every(ft => issueTagsLower.includes(ft))) {
+                                    displayIssue = false;
+                                }
+                            }
+
+                            if(displayIssue) {
+                                resultsHtml += `
+                                    <li>
+                                        <h3 data-issue-id="${issue.id}">${this.escapeHtml(issue.question)}</h3>
+                                        <p>Tags: ${issue.tags && issue.tags.length > 0 ? issue.tags.map(t => `<span class="tag">${this.escapeHtml(t)}</span>`).join(' ') : 'None'}</p>
+                                        <p><small>Click title to view details.</small></p>
+                                    </li>
+                                `;
+                            }
+                        }
+                    }
+                    resultsHtml += '</ul>';
+                    if (!resultsHtml.includes("<li>")) { // Check if any issue actually made it to the list after re-filtering
+                         resultsHtml = '<p>No matching issues found for the combined criteria.</p>';
+                    }
+                } else {
+                    resultsHtml = '<p>No matching issues found.</p>';
+                }
+
+                resultsContainer.innerHTML = `<h3>Results</h3>${resultsHtml}`;
+                
+                // Re-attach listener for the search button if it was part of the rendered HTML
+                const searchButton = document.getElementById('search-button');
+                if (searchButton) {
+                    searchButton.removeEventListener('click', this.performSearchBound); // Remove old if exists
+                    this.performSearchBound = this.performSearch.bind(this); // Bind `this`
+                    searchButton.addEventListener('click', this.performSearchBound);
+                }
+            },
+            performSearchBound: null, // To store the bound version of performSearch
+
+            // --- Backup and Restore ---
+            backupData: async function() {
+                try {
+                    const issues = await this.getAllItems(this.STORE_ISSUES);
+                    const rulings = await this.getAllItems(this.STORE_RULINGS);
+                    const summaries = await this.getAllItems(this.STORE_SUMMARIES);
+
+                    const backupData = {
+                        issues,
+                        rulings,
+                        summaries,
+                        exportDate: new Date().toISOString(),
+                        appName: "FiqhCompareStudioBackup"
+                    };
+
+                    const jsonString = JSON.stringify(backupData, null, 2);
+                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const dateSuffix = new Date().toISOString().slice(0,10).replace(/-/g,'');
+                    a.download = `FiqhCompareStudio_Backup_${dateSuffix}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    this.showNotification("Backup created successfully.", "success");
+                } catch (error) {
+                    console.error("Backup failed:", error);
+                    this.showNotification("Backup failed. See console for details.", "error");
+                }
+            },
+
+            restoreData: async function(file) {
+                if (!file) {
+                    this.showNotification("No file selected for restore.", "error");
+                    return;
+                }
+                if (!confirm("Are you sure you want to restore data? This will ERASE all current data in the application.")) {
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    try {
+                        const backupData = JSON.parse(event.target.result);
+                        if (!backupData.appName || backupData.appName !== "FiqhCompareStudioBackup" || !backupData.issues || !backupData.rulings || !backupData.summaries) {
+                            throw new Error("Invalid or corrupted backup file.");
+                        }
+
+                        // Clear existing data
+                        await this.clearStore(this.STORE_RULINGS);
+                        await this.clearStore(this.STORE_SUMMARIES);
+                        await this.clearStore(this.STORE_ISSUES); // Clear issues last due to potential dependencies if we had them
+
+                        // Import new data
+                        for (const issue of backupData.issues) {
+                            // Remove ID if present to allow auto-increment, or ensure DB handles it if IDs are preserved
+                            // For simplicity, let's assume IDs are preserved if present and valid.
+                            // If IDs are auto-incremented, they should be stripped.
+                            // Our current setup uses autoIncrement, so we should strip IDs.
+                            // However, for backup/restore, it's often better to preserve IDs if possible.
+                            // Let's assume IDs are preserved. If conflicts arise, this needs adjustment.
+                            // The simplest way to handle this with auto-increment is to re-add them and let new IDs be generated,
+                            // then update foreign keys. This is complex.
+                            // A common strategy for backup/restore is to allow setting IDs if the store is empty.
+                            // IndexedDB autoIncrement keys are only generated if the key is not provided or is undefined.
+                            // So, if backup data has IDs, they will be used.
+                            await this.addItem(this.STORE_ISSUES, issue, true); // true to indicate it's a restore op
+                        }
+                        for (const ruling of backupData.rulings) {
+                            await this.addItem(this.STORE_RULINGS, ruling, true);
+                        }
+                        for (const summary of backupData.summaries) {
+                            await this.addItem(this.STORE_SUMMARIES, summary, true);
+                        }
+
+                        this.showNotification("Data restored successfully. Please refresh the application if views don't update.", "success");
+                        this.navigateTo('issuesList'); // Refresh view
+                    } catch (error) {
+                        console.error("Restore failed:", error);
+                        this.showNotification(`Restore failed: ${error.message}`, "error");
+                    } finally {
+                        // Clear the file input
+                        const restoreFileInput = document.getElementById('restore-file');
+                        if(restoreFileInput) restoreFileInput.value = '';
+                    }
+                };
+                reader.readAsText(file);
+            },
+
+
+            // --- IndexedDB Helper Functions ---
+            addItem: function(storeName, item, isRestore = false) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) { reject("DB not initialized"); return; }
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    // If not a restore operation or if item has no ID, let IndexedDB auto-generate it.
+                    // If it's a restore and item has an ID, use it.
+                    // IndexedDB autoIncrement only works if the key path value is undefined.
+                    // So, if `item.id` exists, it will try to use it. If it's part of a restore, this is usually intended.
+                    // If it's a normal add, we should ensure `item.id` is not set.
+                    if (!isRestore) delete item.id; 
+                    
+                    const request = store.add(item);
+                    request.onsuccess = () => resolve(request.result); // Returns the key of the new record
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            updateItem: function(storeName, item) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) { reject("DB not initialized"); return; }
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.put(item);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            deleteItem: function(storeName, id) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) { reject("DB not initialized"); return; }
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.delete(id);
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            getItemById: function(storeName, id) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) { reject("DB not initialized"); return; }
+                    const transaction = this.db.transaction([storeName], 'readonly');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.get(id);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            getAllItems: function(storeName) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) { reject("DB not initialized"); return; }
+                    const transaction = this.db.transaction([storeName], 'readonly');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            getRulingsForIssue: function(issueId) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) { reject("DB not initialized"); return; }
+                    const transaction = this.db.transaction([this.STORE_RULINGS], 'readonly');
+                    const store = transaction.objectStore(this.STORE_RULINGS);
+                    const index = store.index('issueId');
+                    const request = index.getAll(issueId);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            getSummaryForIssue: function(issueId) { // Assuming one summary per issue
+                return new Promise((resolve, reject) => {
+                    if (!this.db) { reject("DB not initialized"); return; }
+                    const transaction = this.db.transaction([this.STORE_SUMMARIES], 'readonly');
+                    const store = transaction.objectStore(this.STORE_SUMMARIES);
+                    const index = store.index('issueId');
+                    const request = index.get(issueId); // Use get() for potentially unique index
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            clearStore: function(storeName) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) { reject("DB not initialized"); return; }
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.clear();
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            // --- Utility Functions ---
+            escapeHtml: function(unsafe) {
+                if (unsafe === null || typeof unsafe === 'undefined') return '';
+                return String(unsafe)
+                    .replace(/&/g, "&")
+                    .replace(/</g, "<")
+                    .replace(/>/g, ">")
+                    .replace(/"/g, "\"")
+                    .replace(/'/g, "'");
+            },
+
+            showNotification: function(message, type = 'info') { // type can be 'info', 'success', 'error'
+                const notificationArea = document.getElementById('notification-area');
+                const note = document.createElement('div');
+                note.textContent = message;
+                note.style.padding = '10px 15px';
+                note.style.marginBottom = '10px';
+                note.style.borderRadius = '5px';
+                note.style.color = '#fff';
+                note.style.opacity = '0.9';
+                note.style.transition = 'opacity 0.5s ease-out';
+
+                if (type === 'success') {
+                    note.style.backgroundColor = '#4CAF50'; // Green
+                } else if (type === 'error') {
+                    note.style.backgroundColor = '#f44336'; // Red
+                } else { // info
+                    note.style.backgroundColor = '#2196F3'; // Blue
+                }
+                
+                notificationArea.appendChild(note);
+                setTimeout(() => {
+                    note.style.opacity = '0';
+                    setTimeout(() => notificationArea.removeChild(note), 500);
+                }, 3000);
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            FiqhCompareStudio.init();
+
+            // Specific event listeners for Backup/Restore view that might not be covered by delegation
+            // if the view is rendered statically or needs file input handling.
+            // This is better handled when the view itself is rendered.
+            // We'll add listeners to buttons when getBackupRestoreView is called and its content added to DOM.
+            // Or use event delegation on a static parent if possible.
+            // For file input, we need a more direct approach.
+            // Let's modify the render function or the view getter to attach these specific listeners.
+
+            // Example of attaching listeners after view is rendered (if needed for specific elements)
+            const observer = new MutationObserver((mutationsList, observer) => {
+                for(const mutation of mutationsList) {
+                    if (mutation.type === 'childList') {
+                        const backupButton = document.getElementById('backup-button');
+                        if (backupButton && !backupButton.dataset.listenerAttached) {
+                            backupButton.addEventListener('click', () => FiqhCompareStudio.backupData());
+                            backupButton.dataset.listenerAttached = 'true';
+                        }
+                        const restoreButton = document.getElementById('restore-button');
+                        if (restoreButton && !restoreButton.dataset.listenerAttached) {
+                            restoreButton.addEventListener('click', () => {
+                                const fileInput = document.getElementById('restore-file');
+                                if (fileInput.files.length > 0) {
+                                    FiqhCompareStudio.restoreData(fileInput.files[0]);
+                                } else {
+                                    FiqhCompareStudio.showNotification("Please select a backup file first.", "error");
+                                }
+                            });
+                            restoreButton.dataset.listenerAttached = 'true';
+                        }
+                        const searchButton = document.getElementById('search-button');
+                        if (searchButton && !searchButton.dataset.listenerAttachedS) {
+                             FiqhCompareStudio.performSearchBound = FiqhCompareStudio.performSearch.bind(FiqhCompareStudio);
+                             searchButton.addEventListener('click', FiqhCompareStudio.performSearchBound);
+                             searchButton.dataset.listenerAttachedS = 'true';
+
+                             // Also trigger search on Enter key in search inputs
+                             document.getElementById('search-term')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') FiqhCompareStudio.performSearch(); });
+                             document.getElementById('search-tags')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') FiqhCompareStudio.performSearch(); });
+                        }
+                    }
+                }
+            });
+            observer.observe(document.getElementById('app-content'), { childList: true, subtree: true });
+        });
+
+    </script>
+</body>
+</html>

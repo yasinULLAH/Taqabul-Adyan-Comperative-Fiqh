@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FiqhCompare Studio</title>
+    <meta name="description" content="Client-side tool for comparing Fiqh rulings based on personal research notes.">
+    <style>
+        /* Author: Yasin Ullah (Pakistan) */
+        /* FiqhCompare Studio CSS */
+
+        :root {
+            --color-bg-dark: #1a202c; /* Dark background */
+            --color-bg-light: #2d3748; /* Slightly lighter background */
+            --color-text-primary: #e2e8f0; /* Light text */
+            --color-text-secondary: #a0aec0; /* Muted text */
+            --color-accent: #4299e1; /* Blue accent */
+            --color-accent-hover: #63b3ed; /* Lighter blue */
+            --color-danger: #e53e3e; /* Red for danger */
+            --color-danger-hover: #fc8181; /* Lighter red */
+            --color-border: #4a5568; /* Border color */
+            --color-card-bg: #2d3748; /* Card background */
+            --color-input-bg: #4a5568; /* Input background */
+            --color-input-border: #636b7a; /* Input border */
+            --color-button-bg: var(--color-accent);
+            --color-button-text: var(--color-text-primary);
+            --color-button-hover-bg: var(--color-accent-hover);
+
+            --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            --font-family-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+            /* Add fonts supporting Arabic/Urdu glyphs if needed, but system fonts are generally good */
+            --font-family-arabic: "Amiri", "Lateef", "Scheherazade", "Traditional Arabic", serif; /* Example Arabic fonts */
+
+            --spacing-unit: 8px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family-sans);
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            background-color: var(--color-bg-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--color-bg-light);
+            padding: var(--spacing-unit) * 2;
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        header h1 {
+            margin-bottom: var(--spacing-unit);
+            color: var(--color-accent);
+            font-size: 1.8rem;
+        }
+
+        header p {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+
+        nav {
+            background-color: var(--color-bg-light);
+            padding: var(--spacing-unit) 0;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-unit) * 4;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--color-text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: var(--spacing-unit) var(--spacing-unit) * 2;
+            transition: color 0.2s ease, border-bottom 0.2s ease;
+        }
+
+        nav button:hover {
+            color: var(--color-accent-hover);
+            border-bottom: 2px solid var(--color-accent-hover);
+        }
+
+        nav button.active {
+             color: var(--color-accent);
+             border-bottom: 2px solid var(--color-accent);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: var(--spacing-unit) * 3;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .view {
+            background-color: var(--color-card-bg);
+            padding: var(--spacing-unit) * 3;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: var(--color-accent);
+            margin-bottom: var(--spacing-unit) * 2;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: var(--spacing-unit);
+        }
+
+        /* Forms */
+        form label {
+            display: block;
+            margin-bottom: var(--spacing-unit);
+            font-weight: bold;
+            color: var(--color-text-secondary);
+        }
+
+        form input[type="text"],
+        form input[type="url"],
+        form textarea,
+        form select {
+            width: 100%;
+            padding: var(--spacing-unit);
+            margin-bottom: var(--spacing-unit) * 2;
+            background-color: var(--color-input-bg);
+            border: 1px solid var(--color-input-border);
+            border-radius: 4px;
+            color: var(--color-text-primary);
+            font-size: 1rem;
+            font-family: var(--font-family-sans); /* Ensure consistent font */
+        }
+
+        form textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: var(--font-family-sans); /* Default */
+        }
+
+        /* Special handling for Arabic/Urdu input areas */
+        textarea[lang="ar"],
+        textarea[lang="ur"],
+        input[lang="ar"],
+        input[lang="ur"] {
+             font-family: var(--font-family-arabic), var(--font-family-sans); /* Prefer Arabic font */
+             direction: rtl; /* Right-to-left direction */
+             text-align: right;
+        }
+
+
+        form button {
+            padding: var(--spacing-unit) var(--spacing-unit) * 2;
+            background-color: var(--color-button-bg);
+            color: var(--color-button-text);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: var(--spacing-unit);
+            transition: background-color 0.2s ease;
+        }
+
+        form button[type="button"] { /* Cancel button */
+            background-color: var(--color-text-secondary);
+        }
+
+        form button:hover {
+            background-color: var(--color-button-hover-bg);
+        }
+
+        form button[type="button"]:hover {
+             background-color: #718096; /* Darker gray */
+        }
+
+        /* Issue List */
+        #issue-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .issue-item {
+            background-color: var(--color-bg-light);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            padding: var(--spacing-unit) * 2;
+            margin-bottom: var(--spacing-unit) * 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .issue-item-info {
+            flex-grow: 1;
+            margin-right: var(--spacing-unit);
+            cursor: pointer;
+        }
+
+        .issue-item-info h3 {
+            margin-bottom: var(--spacing-unit);
+            color: var(--color-accent);
+            font-size: 1.2rem;
+        }
+
+        .issue-item-info p {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+
+        .issue-item-actions button {
+            background: none;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
+            padding: var(--spacing-unit) var(--spacing-unit) * 1.5;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: var(--spacing-unit);
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .issue-item-actions button:hover {
+            background-color: var(--color-border);
+            color: var(--color-text-primary);
+        }
+
+        .issue-item-actions button.delete-button {
+            color: var(--color-danger);
+            border-color: var(--color-danger);
+        }
+         .issue-item-actions button.delete-button:hover {
+            background-color: var(--color-danger);
+            color: var(--color-text-primary);
+        }
+
+
+        /* Issue Detail */
+        #issue-detail-view h2 {
+            margin-bottom: var(--spacing-unit);
+        }
+         #issue-detail-view p {
+             margin-bottom: var(--spacing-unit) * 2;
+             color: var(--color-text-secondary);
+         }
+
+        #issue-detail-actions {
+            margin-bottom: var(--spacing-unit) * 3;
+        }
+
+        #issue-detail-actions button {
+             margin-right: var(--spacing-unit);
+        }
+
+        #rulings-list {
+            list-style: none;
+            padding: 0;
+            margin-top: var(--spacing-unit) * 2;
+        }
+
+        .ruling-item {
+            background-color: var(--color-bg-light);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            padding: var(--spacing-unit) * 2;
+            margin-bottom: var(--spacing-unit) * 2;
+        }
+
+        .ruling-item h4 {
+            margin-bottom: var(--spacing-unit);
+            color: var(--color-accent);
+            font-size: 1.1rem;
+        }
+
+        .ruling-item p {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-unit);
+        }
+
+        .ruling-item-actions {
+            text-align: right;
+        }
+
+         .ruling-item-actions button {
+             background: none;
+             border: 1px solid var(--color-border);
+             color: var(--color-text-secondary);
+             padding: var(--spacing-unit) var(--spacing-unit) * 1.5;
+             border-radius: 4px;
+             cursor: pointer;
+             margin-left: var(--spacing-unit);
+             transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+         }
+
+         .ruling-item-actions button:hover {
+             background-color: var(--color-border);
+             color: var(--color-text-primary);
+         }
+
+         .ruling-item-actions button.delete-button {
+             color: var(--color-danger);
+             border-color: var(--color-danger);
+         }
+          .ruling-item-actions button.delete-button:hover {
+             background-color: var(--color-danger);
+             color: var(--color-text-primary);
+         }
+
+        /* Comparison View */
+        #comparison-view table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--spacing-unit) * 2;
+        }
+
+        #comparison-view th,
+        #comparison-view td {
+            border: 1px solid var(--color-border);
+            padding: var(--spacing-unit) * 1.5;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        #comparison-view th {
+            background-color: var(--color-bg-light);
+            color: var(--color-accent);
+            font-weight: bold;
+            width: 150px; /* Fixed width for the feature column */
+        }
+
+        #comparison-view td {
+            background-color: var(--color-card-bg);
+            color: var(--color-text-primary);
+            white-space: pre-wrap; /* Preserve formatting and wrap */
+            word-break: break-word; /* Break long words */
+        }
+
+         #comparison-view td[lang="ar"],
+         #comparison-view td[lang="ur"] {
+             font-family: var(--font-family-arabic), var(--font-family-sans);
+             direction: rtl;
+             text-align: right;
+         }
+
+
+        /* Backup/Restore View */
+        #backup-restore-view p {
+            margin-bottom: var(--spacing-unit) * 2;
+            color: var(--color-text-secondary);
+        }
+
+        #backup-restore-view input[type="file"] {
+            margin-bottom: var(--spacing-unit) * 2;
+            display: block; /* Ensure it takes full width */
+        }
+
+        #backup-restore-view button {
+             margin-right: var(--spacing-unit);
+             margin-bottom: var(--spacing-unit); /* For smaller screens */
+        }
+
+        /* Search */
+        #search-container {
+            margin-bottom: var(--spacing-unit) * 3;
+            display: flex;
+            gap: var(--spacing-unit);
+        }
+
+        #search-input {
+            flex-grow: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: var(--spacing-unit);
+                align-items: stretch;
+                padding: var(--spacing-unit);
+            }
+
+            nav button {
+                padding: var(--spacing-unit);
+                text-align: center;
+            }
+
+            main {
+                padding: var(--spacing-unit) * 2;
+            }
+
+            .issue-item, .ruling-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .issue-item-info, .ruling-item-info {
+                margin-right: 0;
+                margin-bottom: var(--spacing-unit);
+            }
+
+            .issue-item-actions, .ruling-item-actions {
+                width: 100%;
+                text-align: left;
+            }
+
+            .issue-item-actions button, .ruling-item-actions button {
+                margin-left: 0;
+                margin-right: var(--spacing-unit);
+            }
+
+            #search-container {
+                flex-direction: column;
+            }
+
+            #comparison-view th,
+            #comparison-view td {
+                padding: var(--spacing-unit);
+            }
+
+            #comparison-view th {
+                 width: 100px; /* Adjust fixed width */
+            }
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .button-group {
+            margin-top: var(--spacing-unit) * 2;
+        }
+
+        .link-button {
+            background: none;
+            border: none;
+            color: var(--color-accent);
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+            font-size: inherit;
+            font-family: inherit;
+        }
+
+         .link-button:hover {
+             color: var(--color-accent-hover);
+         }
+
+         .related-issues-list {
+             list-style: none;
+             padding: 0;
+             margin-top: var(--spacing-unit);
+             font-size: 0.9rem;
+             color: var(--color-text-secondary);
+         }
+
+         .related-issues-list li {
+             display: inline-block;
+             margin-right: var(--spacing-unit);
+         }
+button {
+    padding: 6px !important;
+    border-radius: 20px;
+    box-shadow: 1px 0px 9px white;
+	cursor:pointer;
+}
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>FiqhCompare Studio</h1>
+            <p>A personal tool for comparing Fiqh rulings based on your research notes.</p>
+            <p style="font-size: 0.8rem; color: var(--color-danger);">Disclaimer: For personal academic comparison only. Not for deriving personal Fiqh rulings.</p>
+        </header>
+
+        <nav>
+            <button id="nav-issues" class="active">Issues</button>
+            <button id="nav-backup-restore">Backup / Restore</button>
+        </nav>
+
+        <main>
+            <!-- Issue List View -->
+            <section id="issue-list-view" class="view">
+                <h2>Fiqh Issues</h2>
+                <div id="search-container">
+                    <input type="text" id="search-input" placeholder="Search issues, madhhabs, evidence, reasoning...">
+                </div>
+                <button id="add-issue-button">Add New Issue</button>
+                <ul id="issue-list">
+                    <!-- Issue items will be rendered here -->
+                </ul>
+            </section>
+
+            <!-- Issue Detail View -->
+            <section id="issue-detail-view" class="view hidden">
+                <button id="back-to-issues" class="link-button">← Back to Issues</button>
+                <h2 id="detail-issue-title"></h2>
+                <p><strong>Category:</strong> <span id="detail-issue-category"></span></p>
+                <p><strong>Summary:</strong> <span id="detail-issue-summary"></span></p>
+                 <div id="detail-related-issues">
+                     <strong>Related Issues:</strong>
+                     <ul class="related-issues-list">
+                         <!-- Related issues links -->
+                     </ul>
+                 </div>
+
+                <div id="issue-detail-actions" class="button-group">
+                    <button id="edit-issue-button">Edit Issue</button>
+                    <button id="delete-issue-button" class="delete-button">Delete Issue</button>
+                    <button id="add-ruling-button">Add New Ruling</button>
+                    <button id="compare-rulings-button">Compare Rulings</button>
+                </div>
+
+                <h3>Rulings</h3>
+                <ul id="rulings-list">
+                    <!-- Ruling items will be rendered here -->
+                </ul>
+            </section>
+
+            <!-- Issue Form View -->
+            <section id="issue-form-view" class="view hidden">
+                <h2 id="issue-form-title">Add New Issue</h2>
+                <form id="issue-form">
+                    <input type="hidden" id="issue-id">
+                    <div>
+                        <label for="issue-title">Issue/Question:</label>
+                        <input type="text" id="issue-title" required>
+                    </div>
+                    <div>
+                        <label for="issue-category">Category:</label>
+                        <input type="text" id="issue-category" list="category-suggestions">
+                        <datalist id="category-suggestions"></datalist>
+                    </div>
+                     <div>
+                         <label for="issue-related-issues">Related Issue IDs (comma-separated):</label>
+                         <input type="text" id="issue-related-issues" placeholder="e.g., 1, 5, 12">
+                     </div>
+                    <div>
+                        <label for="issue-summary">Your Comparative Summary:</label>
+                        <textarea id="issue-summary"></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit">Save Issue</button>
+                        <button type="button" id="cancel-issue-button">Cancel</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Ruling Form View -->
+            <section id="ruling-form-view" class="view hidden">
+                <h2 id="ruling-form-title">Add New Ruling</h2>
+                <form id="ruling-form">
+                    <input type="hidden" id="ruling-id">
+                    <input type="hidden" id="ruling-issue-id">
+                    <div>
+                        <label for="ruling-madhhab">Madhhab / Scholar:</label>
+                        <input type="text" id="ruling-madhhab" required>
+                    </div>
+                    <div>
+                        <label for="ruling-ruling">Ruling Summary:</label>
+                        <textarea id="ruling-ruling" required></textarea>
+                    </div>
+                    <div>
+                        <label for="ruling-evidence">Primary Evidence (Quran/Sunnah text/references):</label>
+                        <textarea id="ruling-evidence" lang="ar"></textarea> <!-- Suggest Arabic input -->
+                    </div>
+                    <div>
+                        <label for="ruling-reasoning">Reasoning (Your summary of arguments):</label>
+                        <textarea id="ruling-reasoning" lang="ar"></textarea> <!-- Suggest Arabic input -->
+                    </div>
+                    <div class="button-group">
+                        <button type="submit">Save Ruling</button>
+                        <button type="button" id="cancel-ruling-button">Cancel</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Comparison View -->
+            <section id="comparison-view" class="view hidden">
+                <button id="back-to-detail-from-compare" class="link-button">← Back to Issue Details</button>
+                <h2 id="compare-issue-title"></h2>
+                <div id="comparison-table-container">
+                    <!-- Comparison table will be rendered here -->
+                </div>
+            </section>
+
+            <!-- Backup/Restore View -->
+            <section id="backup-restore-view" class="view hidden">
+                <h2>Backup & Restore</h2>
+
+                <h3>Backup</h3>
+                <p>Download your FiqhCompare Studio data as a JSON file.</p>
+                <button id="backup-button">Download Backup</button>
+
+                <h3 style="margin-top: var(--spacing-unit)*4;">Restore</h3>
+                <p>Upload a backup JSON file to restore your data. <strong>Warning: This will replace all existing data!</strong></p>
+                <input type="file" id="restore-file-input" accept=".json">
+                <button id="restore-button">Upload and Restore</button>
+                <p id="restore-warning" style="color: var(--color-danger); margin-top: var(--spacing-unit);">Please select a file first.</p>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // Author: Yasin Ullah (Pakistan)
+        // FiqhCompare Studio JavaScript
+
+        const DB_NAME = 'FiqhCompareDB';
+        const DB_VERSION = 1;
+        let db;
+
+        const issueListView = document.getElementById('issue-list-view');
+        const issueDetailView = document.getElementById('issue-detail-view');
+        const issueFormView = document.getElementById('issue-form-view');
+        const rulingFormView = document.getElementById('ruling-form-view');
+        const comparisonView = document.getElementById('comparison-view');
+        const backupRestoreView = document.getElementById('backup-restore-view');
+
+        const issueList = document.getElementById('issue-list');
+        const issueForm = document.getElementById('issue-form');
+        const rulingForm = document.getElementById('ruling-form');
+        const comparisonTableContainer = document.getElementById('comparison-table-container');
+
+        const addIssueButton = document.getElementById('add-issue-button');
+        const cancelIssueButton = document.getElementById('cancel-issue-button');
+        const cancelRulingButton = document.getElementById('cancel-ruling-button');
+        const backToIssuesButton = document.getElementById('back-to-issues');
+        const addRulingButton = document.getElementById('add-ruling-button');
+        const compareRulingsButton = document.getElementById('compare-rulings-button');
+        const backToDetailFromCompareButton = document.getElementById('back-to-detail-from-compare');
+        const editIssueButton = document.getElementById('edit-issue-button');
+        const deleteIssueButton = document.getElementById('delete-issue-button');
+
+        const searchInput = document.getElementById('search-input');
+
+        const navIssuesButton = document.getElementById('nav-issues');
+        const navBackupRestoreButton = document.getElementById('nav-backup-restore');
+
+        const backupButton = document.getElementById('backup-button');
+        const restoreFileInput = document.getElementById('restore-file-input');
+        const restoreButton = document.getElementById('restore-button');
+        const restoreWarning = document.getElementById('restore-warning');
+
+        let currentIssueId = null; // Track the issue being viewed/edited
+
+        // --- IndexedDB Functions ---
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    if (!db.objectStoreNames.contains('issues')) {
+                        const issueStore = db.createObjectStore('issues', { keyPath: 'id', autoIncrement: true });
+                        issueStore.createIndex('title', 'title', { unique: false });
+                        issueStore.createIndex('category', 'category', { unique: false });
+                    }
+                    if (!db.objectStoreNames.contains('rulings')) {
+                        const rulingStore = db.createObjectStore('rulings', { keyPath: 'id', autoIncrement: true });
+                        rulingStore.createIndex('issueId', 'issueId', { unique: false });
+                        rulingStore.createIndex('madhhab', 'madhhab', { unique: false });
+                         // Note: Indexing large text fields like evidence/reasoning is not standard/efficient in IndexedDB
+                         // Search will be done by iterating
+                    }
+                    if (!db.objectStoreNames.contains('config')) {
+                         db.createObjectStore('config', { keyPath: 'key' });
+                    }
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    console.log('IndexedDB opened successfully');
+                    resolve(db);
+                };
+
+                request.onerror = (event) => {
+                    console.error('IndexedDB error:', event.target.errorCode);
+                    alert('Error opening database. Please ensure your browser supports IndexedDB and try again.');
+                    reject(event.target.error);
+                };
+            });
+        }
+
+        function getObjectStore(storeName, mode) {
+            const transaction = db.transaction(storeName, mode);
+            return transaction.objectStore(storeName);
+        }
+
+        // --- Data CRUD Functions ---
+
+        async function addIssue(issue) {
+            const store = getObjectStore('issues', 'readwrite');
+            issue.createdAt = Date.now();
+            issue.updatedAt = Date.now();
+            return new Promise((resolve, reject) => {
+                const request = store.add(issue);
+                request.onsuccess = (event) => resolve(event.target.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function updateIssue(issue) {
+            const store = getObjectStore('issues', 'readwrite');
+            issue.updatedAt = Date.now();
+            return new Promise((resolve, reject) => {
+                const request = store.put(issue);
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function getIssue(id) {
+            const store = getObjectStore('issues', 'readonly');
+            return new Promise((resolve, reject) => {
+                const request = store.get(id);
+                request.onsuccess = (event) => resolve(event.target.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function getAllIssues() {
+            const store = getObjectStore('issues', 'readonly');
+            return new Promise((resolve, reject) => {
+                const request = store.getAll();
+                request.onsuccess = (event) => resolve(event.target.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function deleteIssue(issueId) {
+             // Delete associated rulings first
+             const rulingStore = getObjectStore('rulings', 'readwrite');
+             const issueRulingsRequest = rulingStore.index('issueId').openCursor(IDBKeyRange.only(issueId));
+
+             issueRulingsRequest.onsuccess = (event) => {
+                 const cursor = event.target.result;
+                 if (cursor) {
+                     cursor.delete();
+                     cursor.continue();
+                 } else {
+                     // All rulings deleted, now delete the issue
+                     const issueStore = getObjectStore('issues', 'readwrite');
+                     const deleteIssueRequest = issueStore.delete(issueId);
+                     deleteIssueRequest.onsuccess = () => console.log(`Issue ${issueId} and its rulings deleted`);
+                     deleteIssueRequest.onerror = (event) => console.error('Error deleting issue:', event.target.error);
+                 }
+             };
+             issueRulingsRequest.onerror = (event) => console.error('Error deleting rulings for issue:', event.target.error);
+        }
+
+
+        async function addRuling(ruling) {
+            const store = getObjectStore('rulings', 'readwrite');
+            ruling.createdAt = Date.now();
+            ruling.updatedAt = Date.now();
+            return new Promise((resolve, reject) => {
+                const request = store.add(ruling);
+                request.onsuccess = (event) => resolve(event.target.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function updateRuling(ruling) {
+            const store = getObjectStore('rulings', 'readwrite');
+            ruling.updatedAt = Date.now();
+            return new Promise((resolve, reject) => {
+                const request = store.put(ruling);
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function getRuling(id) {
+            const store = getObjectStore('rulings', 'readonly');
+            return new Promise((resolve, reject) => {
+                const request = store.get(id);
+                request.onsuccess = (event) => resolve(event.target.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function getRulingsForIssue(issueId) {
+            const store = getObjectStore('rulings', 'readonly');
+            const index = store.index('issueId');
+            return new Promise((resolve, reject) => {
+                const request = index.getAll(IDBKeyRange.only(issueId));
+                request.onsuccess = (event) => resolve(event.target.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function deleteRuling(rulingId) {
+            const store = getObjectStore('rulings', 'readwrite');
+            return new Promise((resolve, reject) => {
+                const request = store.delete(rulingId);
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function getConfig(key) {
+            const store = getObjectStore('config', 'readonly');
+            return new Promise((resolve, reject) => {
+                const request = store.get(key);
+                request.onsuccess = (event) => resolve(event.target.result ? event.target.result.value : null);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function setConfig(key, value) {
+            const store = getObjectStore('config', 'readwrite');
+            return new Promise((resolve, reject) => {
+                const request = store.put({ key, value });
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function getAllCategories() {
+            let categories = await getConfig('categories');
+            if (!categories) {
+                categories = ['Ibadat', 'Muamalat', 'Aqeedah', 'Akhlaq']; // Default categories
+                await setConfig('categories', categories);
+            }
+            return categories;
+        }
+
+        async function addCategory(category) {
+            let categories = await getAllCategories();
+            if (!categories.includes(category)) {
+                categories.push(category);
+                await setConfig('categories', categories);
+            }
+            return categories;
+        }
+
+
+        // --- UI Rendering Functions ---
+
+        function showView(viewElement) {
+            const views = [issueListView, issueDetailView, issueFormView, rulingFormView, comparisonView, backupRestoreView];
+            views.forEach(view => {
+                if (view === viewElement) {
+                    view.classList.remove('hidden');
+                } else {
+                    view.classList.add('hidden');
+                }
+            });
+
+             // Update nav active state
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            if (viewElement === issueListView || issueDetailView || issueFormView || rulingFormView || comparisonView) {
+                 navIssuesButton.classList.add('active');
+            } else if (viewElement === backupRestoreView) {
+                 navBackupRestoreButton.classList.add('active');
+            }
+        }
+
+        async function renderIssueList(issues) {
+            issueList.innerHTML = '';
+            if (!issues || issues.length === 0) {
+                issueList.innerHTML = '<p>No issues added yet. Click "Add New Issue" to get started.</p>';
+                return;
+            }
+
+            for (const issue of issues) {
+                const li = document.createElement('li');
+                li.classList.add('issue-item');
+                li.dataset.id = issue.id;
+
+                const infoDiv = document.createElement('div');
+                infoDiv.classList.add('issue-item-info');
+                infoDiv.innerHTML = `
+                    <h3>${escapeHTML(issue.title)}</h3>
+                    <p>Category: ${escapeHTML(issue.category || 'Uncategorized')}</p>
+                    <p>${escapeHTML(issue.summary ? issue.summary.substring(0, 150) + (issue.summary.length > 150 ? '...' : '') : 'No summary')}</p>
+                `;
+                infoDiv.addEventListener('click', () => viewIssueDetail(issue.id));
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.classList.add('issue-item-actions');
+                 actionsDiv.innerHTML = `
+                     <button class="edit-issue" data-id="${issue.id}">Edit</button>
+                     <button class="delete-issue delete-button" data-id="${issue.id}">Delete</button>
+                 `;
+
+                li.appendChild(infoDiv);
+                li.appendChild(actionsDiv);
+                issueList.appendChild(li);
+            }
+
+             // Add event listeners for edit/delete buttons
+             issueList.querySelectorAll('.edit-issue').forEach(button => {
+                 button.addEventListener('click', (e) => {
+                     e.stopPropagation(); // Prevent triggering the view detail click
+                     const issueId = parseInt(button.dataset.id, 10);
+                     editIssue(issueId);
+                 });
+             });
+             issueList.querySelectorAll('.delete-issue').forEach(button => {
+                 button.addEventListener('click', (e) => {
+                     e.stopPropagation(); // Prevent triggering the view detail click
+                     const issueId = parseInt(button.dataset.id, 10);
+                     confirmDeleteIssue(issueId);
+                 });
+             });
+        }
+
+        async function renderIssueDetail(issueId) {
+            const issue = await getIssue(issueId);
+            if (!issue) {
+                alert('Issue not found!');
+                renderIssueList(await getAllIssues()); // Go back to list
+                return;
+            }
+
+            currentIssueId = issueId;
+
+            document.getElementById('detail-issue-title').textContent = escapeHTML(issue.title);
+            document.getElementById('detail-issue-category').textContent = escapeHTML(issue.category || 'Uncategorized');
+            document.getElementById('detail-issue-summary').textContent = escapeHTML(issue.summary || 'No summary');
+
+            // Render related issues
+            const relatedIssuesList = document.querySelector('#detail-related-issues ul');
+            relatedIssuesList.innerHTML = '';
+            if (issue.relatedIssues && issue.relatedIssues.length > 0) {
+                 const allIssues = await getAllIssues(); // Need all issues to get titles
+                 issue.relatedIssues.forEach(relatedId => {
+                     const related = allIssues.find(i => i.id === relatedId);
+                     if (related) {
+                         const li = document.createElement('li');
+                         const button = document.createElement('button');
+                         button.classList.add('link-button');
+                         button.textContent = escapeHTML(related.title);
+                         button.addEventListener('click', () => viewIssueDetail(related.id));
+                         li.appendChild(button);
+                         relatedIssuesList.appendChild(li);
+                     }
+                 });
+            } else {
+                 relatedIssuesList.innerHTML = '<li>None</li>';
+            }
+
+
+            const rulings = await getRulingsForIssue(issueId);
+            renderRulingsList(rulings);
+
+            showView(issueDetailView);
+        }
+
+        function renderRulingsList(rulings) {
+            const rulingsList = document.getElementById('rulings-list');
+            rulingsList.innerHTML = '';
+            if (!rulings || rulings.length === 0) {
+                rulingsList.innerHTML = '<li><p>No rulings added for this issue yet.</p></li>';
+                return;
+            }
+
+            rulings.forEach(ruling => {
+                const li = document.createElement('li');
+                li.classList.add('ruling-item');
+                li.dataset.id = ruling.id;
+
+                li.innerHTML = `
+                    <h4>${escapeHTML(ruling.madhhab)}</h4>
+                    <p><strong>Ruling:</strong> ${escapeHTML(ruling.ruling)}</p>
+                    <p><strong>Evidence:</strong> <span lang="ar">${escapeHTML(ruling.evidence)}</span></p>
+                    <p><strong>Reasoning:</strong> <span lang="ar">${escapeHTML(ruling.reasoning)}</span></p>
+                    <div class="ruling-item-actions">
+                        <button class="edit-ruling" data-id="${ruling.id}">Edit</button>
+                        <button class="delete-ruling delete-button" data-id="${ruling.id}">Delete</button>
+                    </div>
+                `;
+                rulingsList.appendChild(li);
+            });
+
+             // Add event listeners for edit/delete buttons
+             rulingsList.querySelectorAll('.edit-ruling').forEach(button => {
+                 button.addEventListener('click', () => {
+                     const rulingId = parseInt(button.dataset.id, 10);
+                     editRuling(rulingId);
+                 });
+             });
+              rulingsList.querySelectorAll('.delete-ruling').forEach(button => {
+                 button.addEventListener('click', () => {
+                     const rulingId = parseInt(button.dataset.id, 10);
+                     confirmDeleteRuling(rulingId);
+                 });
+             });
+        }
+
+        async function renderComparisonView(issueId) {
+            const issue = await getIssue(issueId);
+            const rulings = await getRulingsForIssue(issueId);
+
+            if (!issue || !rulings || rulings.length === 0) {
+                alert('Cannot compare. Issue not found or no rulings available.');
+                if (issueId) viewIssueDetail(issueId);
+                else renderIssueList(await getAllIssues());
+                return;
+            }
+
+            document.getElementById('compare-issue-title').textContent = `Comparison: ${escapeHTML(issue.title)}`;
+
+            let tableHTML = '<table><thead><tr><th>Feature</th>';
+            rulings.forEach(r => {
+                tableHTML += `<th>${escapeHTML(r.madhhab)}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+
+            const features = [
+                { key: 'ruling', label: 'Ruling Summary' },
+                { key: 'evidence', label: 'Primary Evidence', lang: 'ar' },
+                { key: 'reasoning', label: 'Reasoning', lang: 'ar' }
+            ];
+
+            features.forEach(feature => {
+                tableHTML += `<tr><td><strong>${feature.label}</strong></td>`;
+                rulings.forEach(r => {
+                    const langAttr = feature.lang ? ` lang="${feature.lang}"` : '';
+                    tableHTML += `<td${langAttr}>${escapeHTML(r[feature.key])}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+
+            tableHTML += '</tbody></table>';
+            comparisonTableContainer.innerHTML = tableHTML;
+
+            showView(comparisonView);
+        }
+
+        async function populateCategoryDatalist() {
+            const categories = await getAllCategories();
+            const datalist = document.getElementById('category-suggestions');
+            datalist.innerHTML = '';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                datalist.appendChild(option);
+            });
+        }
+
+
+        // --- Form Handling ---
+
+        async function showIssueForm(issue = null) {
+            issueForm.reset();
+            document.getElementById('issue-id').value = '';
+            document.getElementById('issue-form-title').textContent = 'Add New Issue';
+            currentIssueId = null; // Clear current issue context
+
+            await populateCategoryDatalist(); // Populate categories
+
+            if (issue) {
+                document.getElementById('issue-id').value = issue.id;
+                document.getElementById('issue-title').value = issue.title;
+                document.getElementById('issue-category').value = issue.category || '';
+                document.getElementById('issue-summary').value = issue.summary || '';
+                 document.getElementById('issue-related-issues').value = issue.relatedIssues ? issue.relatedIssues.join(', ') : '';
+                document.getElementById('issue-form-title').textContent = 'Edit Issue';
+                currentIssueId = issue.id; // Set current issue context for editing
+            }
+
+            showView(issueFormView);
+        }
+
+        async function showRulingForm(issueId, ruling = null) {
+            rulingForm.reset();
+            document.getElementById('ruling-id').value = '';
+            document.getElementById('ruling-issue-id').value = issueId;
+            document.getElementById('ruling-form-title').textContent = 'Add New Ruling';
+
+            if (ruling) {
+                document.getElementById('ruling-id').value = ruling.id;
+                document.getElementById('ruling-madhhab').value = ruling.madhhab;
+                document.getElementById('ruling-ruling').value = ruling.ruling;
+                document.getElementById('ruling-evidence').value = ruling.evidence;
+                document.getElementById('ruling-reasoning').value = ruling.reasoning;
+                document.getElementById('ruling-form-title').textContent = 'Edit Ruling';
+            }
+
+            showView(rulingFormView);
+        }
+
+             issueForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const id = document.getElementById('issue-id').value ? parseInt(document.getElementById('issue-id').value, 10) : null;
+            const title = document.getElementById('issue-title').value.trim();
+            const category = document.getElementById('issue-category').value.trim();
+            const summary = document.getElementById('issue-summary').value.trim();
+             const relatedIssuesInput = document.getElementById('issue-related-issues').value.trim();
+
+             if (!title) {
+                 alert('Issue title is required.');
+                 return;
+             }
+
+             // Parse related issues IDs, filter out non-numbers and the issue's own ID
+             const relatedIssues = relatedIssuesInput
+                 .split(',')
+                 .map(idStr => parseInt(idStr.trim(), 10))
+                 .filter(idNum => !isNaN(idNum) && idNum > 0 && idNum !== id); // Ensure valid numbers and not self-referencing
+
+            // Create the issue object
+            const issue = {
+                title: title,
+                category: category,
+                summary: summary,
+                relatedIssues: relatedIssues
+            };
+
+            try {
+                if (id) {
+                    // If updating, add the ID back to the object
+                    issue.id = id;
+                    await updateIssue(issue);
+                    alert('Issue updated successfully!');
+                } else {
+                    // If adding, the store uses autoIncrement, so the 'id' property
+                    // should NOT be present in the object passed to store.add().
+                    // The addIssue function already handles this by adding timestamps.
+                    const newId = await addIssue(issue); // addIssue returns the new ID
+                    issue.id = newId; // Assign the newly generated ID back to the local issue object
+                    alert('Issue added successfully!');
+                }
+                 // Add the category to suggestions if it's new
+                 if (category) {
+                     await addCategory(category);
+                 }
+                viewIssueDetail(issue.id); // Go to detail view of the saved/new issue
+            } catch (error) {
+                console.error('Error saving issue:', error);
+                alert('Error saving issue. Please try again.');
+            }
+        });
+
+        rulingForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const id = document.getElementById('ruling-id').value ? parseInt(document.getElementById('ruling-id').value, 10) : null;
+            const issueId = parseInt(document.getElementById('ruling-issue-id').value, 10);
+            const madhhab = document.getElementById('ruling-madhhab').value.trim();
+            const rulingText = document.getElementById('ruling-ruling').value.trim();
+            const evidence = document.getElementById('ruling-evidence').value.trim();
+            const reasoning = document.getElementById('ruling-reasoning').value.trim();
+
+             if (!madhhab || !rulingText) {
+                 alert('Madhhab/Scholar and Ruling Summary are required.');
+                 return;
+             }
+
+            const ruling = {
+                id: id, // Will be ignored by add but used by put
+                issueId: issueId,
+                madhhab: madhhab,
+                ruling: rulingText,
+                evidence: evidence,
+                reasoning: reasoning
+            };
+
+            try {
+                if (id) {
+                    await updateRuling(ruling);
+                    alert('Ruling updated successfully!');
+                } else {
+                    await addRuling(ruling);
+                    alert('Ruling added successfully!');
+                }
+                viewIssueDetail(issueId); // Go back to the issue detail
+            } catch (error) {
+                console.error('Error saving ruling:', error);
+                alert('Error saving ruling. Please try again.');
+            }
+        });
+
+        // --- Navigation and View Switching ---
+
+        addIssueButton.addEventListener('click', () => showIssueForm());
+        cancelIssueButton.addEventListener('click', () => renderIssueList(getAllIssues())); // Go back to list
+        cancelRulingButton.addEventListener('click', () => viewIssueDetail(parseInt(document.getElementById('ruling-issue-id').value, 10))); // Go back to issue detail
+        backToIssuesButton.addEventListener('click', () => renderIssueList(getAllIssues())); // Go back to list
+        backToDetailFromCompareButton.addEventListener('click', () => viewIssueDetail(currentIssueId)); // Go back to detail
+
+        addRulingButton.addEventListener('click', () => showRulingForm(currentIssueId));
+        compareRulingsButton.addEventListener('click', () => renderComparisonView(currentIssueId));
+        editIssueButton.addEventListener('click', () => editIssue(currentIssueId));
+        deleteIssueButton.addEventListener('click', () => confirmDeleteIssue(currentIssueId));
+
+        navIssuesButton.addEventListener('click', async () => {
+            searchInput.value = ''; // Clear search when navigating
+            renderIssueList(await getAllIssues());
+        });
+        navBackupRestoreButton.addEventListener('click', () => {
+             showView(backupRestoreView);
+             restoreButton.disabled = true; // Disable restore until a file is selected
+             restoreWarning.textContent = 'Please select a file first.';
+        });
+
+
+        // --- Edit/Delete Actions ---
+
+        async function editIssue(issueId) {
+             const issue = await getIssue(issueId);
+             if (issue) {
+                 showIssueForm(issue);
+             } else {
+                 alert('Issue not found!');
+                 renderIssueList(await getAllIssues());
+             }
+        }
+
+        async function confirmDeleteIssue(issueId) {
+            const issue = await getIssue(issueId);
+            if (issue && confirm(`Are you sure you want to delete the issue "${issue.title}" and all its rulings?`)) {
+                try {
+                    await deleteIssue(issueId);
+                    alert('Issue deleted successfully!');
+                    renderIssueList(await getAllIssues()); // Refresh list
+                } catch (error) {
+                    console.error('Error deleting issue:', error);
+                    alert('Error deleting issue. Please try again.');
+                }
+            }
+        }
+
+        async function editRuling(rulingId) {
+             const ruling = await getRuling(rulingId);
+             if (ruling) {
+                 showRulingForm(ruling.issueId, ruling);
+             } else {
+                 alert('Ruling not found!');
+                 viewIssueDetail(currentIssueId); // Stay on issue detail
+             }
+        }
+
+        async function confirmDeleteRuling(rulingId) {
+            if (confirm('Are you sure you want to delete this ruling?')) {
+                try {
+                    const ruling = await getRuling(rulingId);
+                    if (ruling) {
+                        const issueId = ruling.issueId;
+                        await deleteRuling(rulingId);
+                        alert('Ruling deleted successfully!');
+                        renderIssueDetail(issueId); // Refresh rulings list on detail view
+                    } else {
+                         alert('Ruling not found!');
+                         renderIssueDetail(currentIssueId); // Stay on issue detail
+                    }
+                } catch (error) {
+                    console.error('Error deleting ruling:', error);
+                    alert('Error deleting ruling. Please try again.');
+                }
+            }
+        }
+
+
+        // --- Search Functionality ---
+
+        searchInput.addEventListener('input', debounce(async (event) => {
+            const searchTerm = event.target.value.toLowerCase().trim();
+            if (searchTerm.length < 2 && searchTerm !== '') return; // Require at least 2 characters or be empty
+
+            if (searchTerm === '') {
+                renderIssueList(await getAllIssues()); // Show all if search is empty
+                return;
+            }
+
+            // Perform search across issues and rulings
+            const allIssues = await getAllIssues();
+            const allRulings = await new Promise((resolve, reject) => {
+                 const store = getObjectStore('rulings', 'readonly');
+                 const request = store.getAll();
+                 request.onsuccess = (event) => resolve(event.target.result);
+                 request.onerror = (event) => reject(event.target.error);
+            });
+
+
+            const matchingIssueIds = new Set();
+
+            // Search in issues (title, category, summary)
+            allIssues.forEach(issue => {
+                if (
+                    (issue.title && issue.title.toLowerCase().includes(searchTerm)) ||
+                    (issue.category && issue.category.toLowerCase().includes(searchTerm)) ||
+                    (issue.summary && issue.summary.toLowerCase().includes(searchTerm))
+                ) {
+                    matchingIssueIds.add(issue.id);
+                }
+            });
+
+            // Search in rulings (madhhab, ruling, evidence, reasoning)
+            allRulings.forEach(ruling => {
+                 if (
+                     (ruling.madhhab && ruling.madhhab.toLowerCase().includes(searchTerm)) ||
+                     (ruling.ruling && ruling.ruling.toLowerCase().includes(searchTerm)) ||
+                     (ruling.evidence && ruling.evidence.toLowerCase().includes(searchTerm)) ||
+                     (ruling.reasoning && ruling.reasoning.toLowerCase().includes(searchTerm))
+                 ) {
+                     matchingIssueIds.add(ruling.issueId); // Add the issue ID this ruling belongs to
+                 }
+            });
+
+            // Filter issues based on matching IDs
+            const results = allIssues.filter(issue => matchingIssueIds.has(issue.id));
+
+            renderIssueList(results); // Render filtered list
+            showView(issueListView); // Ensure issue list view is shown
+        }, 300)); // Debounce search input
+
+        // Simple debounce utility
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+
+
+        // --- Backup & Restore ---
+
+        backupButton.addEventListener('click', async () => {
+            try {
+                const allIssues = await getAllIssues();
+                const allRulings = await new Promise((resolve, reject) => {
+                    const store = getObjectStore('rulings', 'readonly');
+                    const request = store.getAll();
+                    request.onsuccess = (event) => resolve(event.target.result);
+                    request.onerror = (event) => reject(event.target.error);
+                });
+                 const config = await new Promise((resolve, reject) => {
+                     const store = getObjectStore('config', 'readonly');
+                     const request = store.getAll();
+                     request.onsuccess = (event) => resolve(event.target.result);
+                     request.onerror = (event) => reject(event.target.error);
+                 });
+
+
+                const backupData = {
+                    version: DB_VERSION,
+                    timestamp: Date.now(),
+                    issues: allIssues,
+                    rulings: allRulings,
+                    config: config
+                };
+
+                const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `fiqhcompare_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                alert('Backup downloaded successfully!');
+
+            } catch (error) {
+                console.error('Backup failed:', error);
+                alert('Backup failed. See console for details.');
+            }
+        });
+
+        restoreFileInput.addEventListener('change', (event) => {
+            if (event.target.files.length > 0) {
+                restoreButton.disabled = false;
+                restoreWarning.textContent = 'Click "Upload and Restore" to proceed. This will replace all existing data.';
+                restoreWarning.style.color = 'var(--color-text-secondary)';
+            } else {
+                restoreButton.disabled = true;
+                restoreWarning.textContent = 'Please select a file first.';
+                restoreWarning.style.color = 'var(--color-danger)';
+            }
+        });
+
+        restoreButton.addEventListener('click', async () => {
+            const file = restoreFileInput.files[0];
+            if (!file) {
+                alert('Please select a backup file.');
+                return;
+            }
+
+            if (!confirm('WARNING: Restoring will delete ALL your current data and replace it with the data from the selected file. Are you absolutely sure you want to continue?')) {
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = async (event) => {
+                try {
+                    const backupData = JSON.parse(event.target.result);
+
+                    if (!backupData || !Array.isArray(backupData.issues) || !Array.isArray(backupData.rulings) || !Array.isArray(backupData.config)) {
+                        throw new Error('Invalid backup file format.');
+                    }
+
+                    // Close the current DB connection before deleting
+                    if (db) {
+                        db.close();
+                        db = null; // Ensure db variable is nullified
+                    }
+
+                    // Delete the existing database
+                    const deleteRequest = indexedDB.deleteDatabase(DB_NAME);
+
+                    deleteRequest.onsuccess = async () => {
+                        console.log('Existing database deleted successfully.');
+
+                        // Re-open and populate the database
+                        try {
+                             const newDb = await openDB(); // This will trigger onupgradeneeded again if needed
+                             db = newDb; // Set the global db variable
+
+                             const transaction = db.transaction(['issues', 'rulings', 'config'], 'readwrite');
+                             const issueStore = transaction.objectStore('issues');
+                             const rulingStore = transaction.objectStore('rulings');
+                             const configStore = transaction.objectStore('config');
+
+                             // Add data from backup
+                             for (const issue of backupData.issues) {
+                                 // Remove auto-generated key if present, ensure data structure matches store
+                                 const issueToAdd = { ...issue };
+                                 delete issueToAdd.id; // Let IndexedDB generate new keys or use provided ones if they fit
+                                 // To preserve IDs, you'd need to handle this more carefully,
+                                 // potentially using put() and managing potential ID clashes.
+                                 // For simplicity, let's add as new entries. This means IDs WILL change.
+                                 // A more robust approach would involve checking existing IDs or clearing the store fully first.
+                                 // Let's clear the store fully first for a clean restore.
+
+                             }
+
+                             // Clear stores before adding (safer than relying on put with old IDs)
+                             await new Promise((resolve, reject) => {
+                                 const clearTransaction = db.transaction(['issues', 'rulings', 'config'], 'readwrite');
+                                 clearTransaction.oncomplete = () => resolve();
+                                 clearTransaction.onerror = (event) => reject(event.target.error);
+                                 clearTransaction.objectStore('issues').clear();
+                                 clearTransaction.objectStore('rulings').clear();
+                                 clearTransaction.objectStore('config').clear();
+                             });
+
+                             // Now add data from backup, preserving original IDs if possible
+                             // This requires the stores to NOT be autoIncrement if we want to use the backup IDs.
+                             // Since the current schema uses autoIncrement, we have two options:
+                             // 1. Change schema to not use autoIncrement (more complex, requires migration).
+                             // 2. Add data as new entries, losing original IDs but preserving relationships via issueId.
+                             // Option 2 is simpler for a single-file app with autoIncrement.
+                             // Let's re-evaluate the schema: autoIncrement is simpler for CRUD.
+                             // If we restore, the IDs will be new. Relationships (ruling.issueId) will need mapping. This is complex.
+
+                             // Let's rethink restore for autoIncrement:
+                             // 1. Clear stores.
+                             // 2. Add issues from backup. Keep a map of oldId -> newId.
+                             // 3. Add rulings from backup, using the map to update ruling.issueId to the new issue ID.
+                             // 4. Add config.
+
+                             const oldIdToNewIdMap = new Map();
+                             const issuesToAdd = backupData.issues.map(issue => {
+                                 const oldId = issue.id;
+                                 delete issue.id; // Let IndexedDB assign new ID
+                                 return { oldId, issue };
+                             });
+
+                             for (const { oldId, issue } of issuesToAdd) {
+                                 const newId = await addIssue(issue); // addIssue returns the new ID
+                                 oldIdToNewIdMap.set(oldId, newId);
+                             }
+
+                             const rulingsToAdd = backupData.rulings.map(ruling => {
+                                 delete ruling.id; // Let IndexedDB assign new ID
+                                 // Update issueId using the map
+                                 ruling.issueId = oldIdToNewIdMap.get(ruling.issueId);
+                                 return ruling;
+                             }).filter(ruling => ruling.issueId !== undefined); // Only add rulings whose issue was successfully mapped
+
+                             for (const ruling of rulingsToAdd) {
+                                 await addRuling(ruling); // addRuling returns the new ID, but we don't need it here
+                             }
+
+                             // Add config data
+                             for (const item of backupData.config) {
+                                 await setConfig(item.key, item.value);
+                             }
+
+
+                             alert('Restore completed successfully!');
+                             restoreFileInput.value = ''; // Clear file input
+                             restoreButton.disabled = true;
+                             restoreWarning.textContent = 'Please select a file first.';
+                             restoreWarning.style.color = 'var(--color-danger)';
+                             renderIssueList(await getAllIssues()); // Refresh UI
+
+                         } catch (dbError) {
+                             console.error('Error during database re-opening or population:', dbError);
+                             alert('Error during database restore process. Data might be lost or incomplete. See console.');
+                             // Attempt to re-open DB to leave it in a usable state, even if empty
+                             openDB().then(() => renderIssueList(getAllIssues())).catch(console.error);
+                         }
+                    };
+
+                    deleteRequest.onerror = (event) => {
+                        console.error('Error deleting existing database:', event.target.error);
+                        alert('Error deleting existing data during restore. Restore failed. See console.');
+                        // Attempt to re-open DB
+                        openDB().then(() => renderIssueList(getAllIssues())).catch(console.error);
+                    };
+
+                } catch (parseError) {
+                    console.error('Error parsing backup file:', parseError);
+                    alert('Error reading or parsing the backup file. It might be corrupted or not a valid FiqhCompare Studio backup.');
+                    restoreFileInput.value = ''; // Clear file input
+                    restoreButton.disabled = true;
+                    restoreWarning.textContent = 'Please select a file first.';
+                    restoreWarning.style.color = 'var(--color-danger)';
+                }
+            };
+
+            reader.onerror = (event) => {
+                console.error('File reading error:', event.target.error);
+                alert('Error reading the file.');
+                restoreFileInput.value = ''; // Clear file input
+                restoreButton.disabled = true;
+                restoreWarning.textContent = 'Please select a file first.';
+                restoreWarning.style.color = 'var(--color-danger)';
+            };
+
+            reader.readAsText(file);
+        });
+
+
+        // --- Utility ---
+
+        function escapeHTML(str) {
+             if (typeof str !== 'string') return '';
+             const div = document.createElement('div');
+             div.appendChild(document.createTextNode(str));
+             return div.innerHTML;
+        }
+
+        // --- Initial Load ---
+
+        async function init() {
+            try {
+                await openDB();
+                // Check if there's a hash in the URL to navigate directly (e.g., #issue=5)
+                const hash = window.location.hash;
+                if (hash.startsWith('#issue=')) {
+                    const issueId = parseInt(hash.substring(7), 10);
+                    if (!isNaN(issueId)) {
+                        // Check if issue exists before navigating
+                        const issue = await getIssue(issueId);
+                        if (issue) {
+                            viewIssueDetail(issueId);
+                        } else {
+                            // Issue not found, go to list
+                            window.history.replaceState(null, null, ' '); // Clear hash
+                            renderIssueList(await getAllIssues());
+                        }
+                    } else {
+                         window.history.replaceState(null, null, ' '); // Clear hash
+                         renderIssueList(await getAllIssues());
+                    }
+                } else {
+                    renderIssueList(await getAllIssues()); // Default to issue list
+                }
+
+            } catch (error) {
+                console.error('Initialization failed:', error);
+                // UI should already show an error from openDB
+            }
+        }
+
+        // Function to navigate to issue detail and update URL hash
+        async function viewIssueDetail(issueId) {
+             await renderIssueDetail(issueId);
+             window.location.hash = `#issue=${issueId}`;
+        }
+
+        // Listen for hash changes to enable back/forward navigation
+        window.addEventListener('hashchange', async () => {
+             const hash = window.location.hash;
+             if (hash.startsWith('#issue=')) {
+                 const issueId = parseInt(hash.substring(7), 10);
+                 if (!isNaN(issueId) && issueId !== currentIssueId) { // Prevent re-rendering if already on this issue
+                     const issue = await getIssue(issueId); // Check if it exists
+                     if (issue) {
+                          renderIssueDetail(issueId);
+                     } else {
+                          // Issue not found, clear hash and go to list
+                          window.history.replaceState(null, null, ' ');
+                          renderIssueList(await getAllIssues());
+                     }
+                 } else if (isNaN(issueId)) {
+                     // Invalid hash format, clear hash and go to list
+                     window.history.replaceState(null, null, ' ');
+                     renderIssueList(await getAllIssues());
+                 }
+             } else if (currentIssueId !== null) {
+                 // Hash cleared or changed to something else, go back to list
+                 currentIssueId = null; // Clear context
+                 renderIssueList(await getAllIssues());
+             }
+             // If hash is empty and currentIssueId is null, we are already on the list view, do nothing.
+        });
+
+
+        // Start the app
+        init();
+
+    </script>
+</body>
+</html>

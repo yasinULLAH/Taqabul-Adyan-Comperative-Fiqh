@@ -1,0 +1,2035 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FiqhCompare Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #283c5a;
+            --secondary: #3f5e88;
+            --accent: #93b0d6;
+            --light: #f4f6fa;
+            --dark: #1a2639;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --border-radius: 6px;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .arabic {
+            font-family: 'Amiri', serif;
+            direction: rtl;
+        }
+        
+        .urdu {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            direction: rtl;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .app-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .app-title h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .main-menu {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .main-menu button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .main-menu button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            max-width: 100%;
+            height: calc(100vh - 60px);
+        }
+        
+        .sidebar {
+            background-color: white;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .sidebar-section h3 {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .issue-list {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+        
+        .issue-item {
+            padding: 0.5rem;
+            margin-bottom: 0.3rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        
+        .issue-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .issue-item.active {
+            background-color: var(--accent);
+            color: var(--dark);
+        }
+        
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .tag {
+            background-color: #f0f0f0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .tag:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .tag.active {
+            background-color: var(--accent);
+            color: var(--dark);
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+        }
+        
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: .75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+        
+        .main-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+            background-color: #fafafa;
+        }
+        
+        .view-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .issue-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .issue-header h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .issue-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .issue-tags {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #f5f5f5;
+            padding: 0 1rem;
+        }
+        
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            padding: 1.5rem;
+        }
+        
+        .madhhab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .madhhab-card {
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .madhhab-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1rem;
+        }
+        
+        .madhhab-body {
+            padding: 1rem;
+        }
+        
+        .madhhab-section {
+            margin-bottom: 1rem;
+        }
+        
+        .madhhab-section h4 {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .evidence-item {
+            background-color: #f9f9f9;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+        }
+        
+        .evidence-source {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+        
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .compare-table th, 
+        .compare-table td {
+            padding: 1rem;
+            border: 1px solid #eee;
+        }
+        
+        .compare-table th {
+            background-color: var(--primary);
+            color: white;
+            text-align: left;
+        }
+        
+        .compare-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        button.action {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button.action:hover {
+            background-color: var(--secondary);
+        }
+        
+        button.action.secondary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        
+        button.action.secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        button.icon-btn {
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.3rem;
+            transition: color 0.2s;
+        }
+        
+        button.icon-btn:hover {
+            color: var(--primary);
+        }
+        
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-backdrop.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(63, 94, 136, 0.2);
+        }
+        
+        .select-wrap {
+            position: relative;
+        }
+        
+        .select-wrap::after {
+            content: "▼";
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            pointer-events: none;
+            font-size: 0.8rem;
+        }
+        
+        select.form-control {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 2rem;
+            background-color: white;
+        }
+        
+        .madhhab-fields {
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .madhhab-fields-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .madhhab-fields h4 {
+            font-size: 1rem;
+            color: var(--primary);
+        }
+        
+        .evidence-fields {
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.8rem;
+        }
+        
+        .evidence-fields-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        button.sm {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+        }
+        
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+            color: #777;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+        
+        .empty-state p {
+            max-width: 500px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .summary-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-section h3 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .related-issues {
+            margin-top: 1.5rem;
+        }
+        
+        .related-issues h3 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .related-issues-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .related-issue-item {
+            background-color: #f0f0f0;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .related-issue-item:hover {
+            background-color: var(--accent);
+            color: var(--dark);
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: var(--dark);
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification.success {
+            background-color: var(--success);
+        }
+        
+        .notification.error {
+            background-color: var(--danger);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                height: auto;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 280px;
+                height: calc(100vh - 60px);
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+                z-index: 50;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .sidebar-toggle {
+                display: block;
+                position: fixed;
+                bottom: 1rem;
+                left: 1rem;
+                z-index: 60;
+                background-color: var(--primary);
+                color: white;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                border: none;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+            
+            .madhhab-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .lang-toggle {
+            padding: 0.3rem 0.6rem;
+            margin-right: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+    </style>
+	<style>
+    /* Fix container layout */
+    .container {
+        flex: 1;
+        display: flex;  /* Change from grid to flex */
+        max-width: 100%;
+        height: calc(100vh - 60px);
+    }
+    
+    .sidebar {
+        width: 280px;  /* Set fixed width */
+        flex-shrink: 0;  /* Prevent sidebar from shrinking */
+        background-color: white;
+        border-right: 1px solid #e0e0e0;
+        overflow-y: auto;
+        padding: 1rem;
+        height: 100%;
+    }
+    
+    .main-content {
+        flex: 1;  /* Take remaining space */
+        padding: 1.5rem;
+        overflow-y: auto;
+        background-color: #fafafa;
+    }
+    
+    /* Fix mobile sidebar toggle */
+    .sidebar-toggle {
+        display: none;  /* Hide by default */
+        position: fixed;
+        bottom: 1rem;
+        left: 1rem;
+        z-index: 60;
+        background-color: var(--primary);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    
+    /* Update media query */
+    @media (max-width: 768px) {
+        .container {
+            display: block;  /* Change to block on mobile */
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 280px;
+            height: calc(100vh - 60px);
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+            z-index: 50;
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        .sidebar-toggle {
+            display: block;  /* Show only on mobile */
+        }
+        
+        .main-content {
+            width: 100%;
+            padding: 1rem;
+        }
+    }
+</style>
+</head>
+<body>
+<header>
+<div class="app-title">
+<h1>FiqhCompare Studio</h1>
+<div class="main-menu">
+<button id="newIssueBtn">New Issue</button>
+<button id="exportBtn">Export Data</button>
+<button id="importBtn">Import Data</button>
+</div>
+</div>
+</header>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search issues, madhabs, evidence...">
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Fiqh Categories</h3>
+                <div class="tag-list" id="categoryTags">
+                    <span class="tag" data-category="Ibadat">Ibadat</span>
+                    <span class="tag" data-category="Muamalat">Muamalat</span>
+                    <span class="tag" data-category="Nikah">Nikah</span>
+                    <span class="tag" data-category="Talaq">Talaq</span>
+                    <span class="tag" data-category="Inheritance">Inheritance</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Issues</h3>
+                <ul class="issue-list" id="issuesList">
+                    <!-- Issues will be populated here -->
+                </ul>
+            </div>
+        </aside>
+        
+        <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+        
+        <main class="main-content" id="mainContent">
+            <!-- Main content will be populated here -->
+        </main>
+    </div>
+    
+    <div class="modal-backdrop" id="issueModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="issueModalTitle">New Fiqh Issue</h3>
+                <button class="icon-btn" id="closeIssueModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="issueForm">
+                    <input type="hidden" id="issueId" value="">
+                    <div class="form-group">
+                        <label for="issueTitle">Issue/Question Title</label>
+                        <input type="text" id="issueTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="issueDescription">Description</label>
+                        <textarea id="issueDescription" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Categories</label>
+                        <div class="tag-list">
+                            <span class="tag" data-category="Ibadat">Ibadat</span>
+                            <span class="tag" data-category="Muamalat">Muamalat</span>
+                            <span class="tag" data-category="Nikah">Nikah</span>
+                            <span class="tag" data-category="Talaq">Talaq</span>
+                            <span class="tag" data-category="Inheritance">Inheritance</span>
+                            <input type="text" id="newCategoryInput" placeholder="+ Add new" class="form-control" style="width: 100px; margin-top: 0.5rem">
+                        </div>
+                        <input type="hidden" id="selectedCategories">
+                    </div>
+                    
+                    <h4 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--primary);">Madhhab Positions</h4>
+                    <div id="madhahibContainer">
+                        <!-- Madhahib fields will be added here -->
+                    </div>
+                    
+                    <button type="button" id="addMadhabBtn" class="action secondary" style="margin-top: 1rem;">
+                        Add Another Madhab/Scholar
+                    </button>
+                    
+                    <div class="form-group" style="margin-top: 2rem;">
+                        <label for="issueSummary">Your Comparative Summary</label>
+                        <textarea id="issueSummary" class="form-control" placeholder="Your analysis of the different positions..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Related Issues</label>
+                        <div id="relatedIssuesContainer" class="related-issues-list">
+                            <!-- Related issues will be added here -->
+                        </div>
+                        <div class="select-wrap" style="margin-top: 0.5rem;">
+                            <select id="relatedIssueSelect" class="form-control">
+                                <option value="">Select related issue</option>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="action secondary" id="cancelIssueBtn">Cancel</button>
+                <button class="action" id="saveIssueBtn">Save Issue</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        Operation completed successfully
+    </div>
+    
+    <script>
+        // Utility functions
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document);
+        const on = (el, event, fn) => {
+            if (el) el.addEventListener(event, fn);
+            return { off: () => el && el.removeEventListener(event, fn) };
+        };
+        
+        // IndexedDB setup
+        const idbP = {
+            db: null,
+            name: 'FiqhCompareDB',
+            version: 1,
+            
+            init() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(this.name, this.version);
+                    
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        
+                        if (!db.objectStoreNames.contains('issues')) {
+                            const issuesStore = db.createObjectStore('issues', { keyPath: 'id', autoIncrement: true });
+                            issuesStore.createIndex('title', 'title', { unique: false });
+                            issuesStore.createIndex('categories', 'categories', { unique: false, multiEntry: true });
+                            issuesStore.createIndex('createdAt', 'createdAt', { unique: false });
+                        }
+                    };
+                    
+                    req.onsuccess = (e) => {
+                        this.db = e.target.result;
+                        resolve(this.db);
+                    };
+                    
+                    req.onerror = (e) => {
+                        reject(`IndexedDB error: ${e.target.error}`);
+                    };
+                });
+            },
+            
+            getAll(storeName) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction(storeName, 'readonly');
+                    const store = tx.objectStore(storeName);
+                    const req = store.getAll();
+                    
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            
+            get(storeName, id) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction(storeName, 'readonly');
+                    const store = tx.objectStore(storeName);
+                    const req = store.get(id);
+                    
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            
+            add(storeName, data) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    const req = store.add(data);
+                    
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            
+            update(storeName, data) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    const req = store.put(data);
+                    
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            
+            delete(storeName, id) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    const req = store.delete(id);
+                    
+                    req.onsuccess = () => resolve();
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            
+            query(storeName, indexName, value) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction(storeName, 'readonly');
+                    const store = tx.objectStore(storeName);
+                    const index = store.index(indexName);
+                    const req = index.getAll(value);
+                    
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            
+            search(storeName, term) {
+                return new Promise(async (resolve) => {
+                    const allItems = await this.getAll(storeName);
+                    const lowerTerm = term.toLowerCase();
+                    
+                    const results = allItems.filter(item => {
+                        // Search in title and description
+                        if (item.title.toLowerCase().includes(lowerTerm) || 
+                            (item.description && item.description.toLowerCase().includes(lowerTerm))) {
+                            return true;
+                        }
+                        
+                        // Search in madhahib
+                        if (item.madhahib && item.madhahib.length > 0) {
+                            for (const madhab of item.madhahib) {
+                                if (madhab.name.toLowerCase().includes(lowerTerm) ||
+                                    madhab.ruling.toLowerCase().includes(lowerTerm) ||
+                                    madhab.reasoning.toLowerCase().includes(lowerTerm)) {
+                                    return true;
+                                }
+                                
+                                // Search in evidence
+                                if (madhab.evidence && madhab.evidence.length > 0) {
+                                    for (const evidence of madhab.evidence) {
+                                        if (evidence.source.toLowerCase().includes(lowerTerm) ||
+                                            evidence.text.toLowerCase().includes(lowerTerm)) {
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        return false;
+                    });
+                    
+                    resolve(results);
+                });
+            },
+            
+            exportData() {
+                return new Promise(async (resolve) => {
+                    const allIssues = await this.getAll('issues');
+                    const data = {
+                        version: this.version,
+                        issues: allIssues,
+                        exportDate: new Date().toISOString()
+                    };
+                    resolve(data);
+                });
+            },
+            
+            importData(data) {
+                return new Promise(async (resolve, reject) => {
+                    if (!data.issues || !Array.isArray(data.issues)) {
+                        reject('Invalid data format');
+                        return;
+                    }
+                    
+                    const tx = this.db.transaction('issues', 'readwrite');
+                    const store = tx.objectStore('issues');
+                    
+                    for (const issue of data.issues) {
+                        await new Promise((res) => {
+                            const req = store.put(issue);
+                            req.onsuccess = () => res();
+                            req.onerror = () => res(); // Continue even if error
+                        });
+                    }
+                    
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
+                });
+            }
+        };
+        
+        // App UI controller
+        const app = {
+            currentIssueId: null,
+            selectedCategories: [],
+            activeTab: 'details',
+            
+            async init() {
+                await idbP.init();
+                
+                this.bindEvents();
+                this.loadIssuesList();
+                this.renderEmptyState();
+                
+                // Check if there are any issues, show sample data if none
+                const issues = await idbP.getAll('issues');
+                if (issues.length === 0) {
+                    this.createSampleData();
+                }
+            },
+            
+            bindEvents() {
+                // Menu buttons
+                on($('#newIssueBtn'), 'click', () => this.openIssueModal());
+                on($('#exportBtn'), 'click', () => this.exportData());
+                on($('#importBtn'), 'click', () => this.importData());
+                
+                // Issue modal
+                on($('#closeIssueModal'), 'click', () => this.closeIssueModal());
+                on($('#cancelIssueBtn'), 'click', () => this.closeIssueModal());
+                on($('#saveIssueBtn'), 'click', () => this.saveIssue());
+                on($('#addMadhabBtn'), 'click', () => this.addMadhabFields());
+                
+                // Category tags in modal
+                const categoryTags = $$('#issueForm .tag');
+                categoryTags.forEach(tag => {
+                    on(tag, 'click', () => {
+                        tag.classList.toggle('active');
+                        this.updateSelectedCategories();
+                    });
+                });
+                
+                // New category input
+                on($('#newCategoryInput'), 'keydown', (e) => {
+                    if (e.key === 'Enter' && e.target.value.trim()) {
+                        e.preventDefault();
+                        const category = e.target.value.trim();
+                        this.addCategoryTag(category);
+                        e.target.value = '';
+                    }
+                });
+                
+                // Search
+                on($('#searchInput'), 'input', (e) => this.searchIssues(e.target.value));
+                
+                // Category filtering
+                const sidebarCategories = $$('#categoryTags .tag');
+                sidebarCategories.forEach(tag => {
+                    on(tag, 'click', () => {
+                        tag.classList.toggle('active');
+                        const activeCategories = Array.from($$('#categoryTags .tag.active'))
+                            .map(t => t.dataset.category);
+                        
+                        this.filterIssuesByCategories(activeCategories);
+                    });
+                });
+                
+                // Mobile sidebar toggle
+                on($('#sidebarToggle'), 'click', () => {
+                    $('#sidebar').classList.toggle('active');
+                });
+                
+                // Click outside sidebar to close on mobile
+                on(document, 'click', (e) => {
+                    if (window.innerWidth <= 768 && 
+                        $('#sidebar').classList.contains('active') && 
+                        !$('#sidebar').contains(e.target) &&
+                        e.target !== $('#sidebarToggle')) {
+                        $('#sidebar').classList.remove('active');
+                    }
+                });
+            },
+            
+            async loadIssuesList() {
+                const issues = await idbP.getAll('issues');
+                issues.sort((a, b) => b.updatedAt - a.updatedAt);
+                
+                const list = $('#issuesList');
+                list.innerHTML = '';
+                
+                issues.forEach(issue => {
+                    const item = document.createElement('li');
+                    item.className = 'issue-item';
+                    item.textContent = issue.title;
+                    item.dataset.id = issue.id;
+                    
+                    on(item, 'click', () => this.loadIssue(issue.id));
+                    
+                    list.appendChild(item);
+                });
+            },
+            
+            async loadIssue(id) {
+                this.currentIssueId = id;
+                
+                // Update active issue in the list
+                const items = $$('#issuesList .issue-item');
+                items.forEach(item => item.classList.remove('active'));
+                $(`#issuesList .issue-item[data-id="${id}"]`)?.classList.add('active');
+                
+                const issue = await idbP.get('issues', parseInt(id));
+                const content = $('#mainContent');
+                
+                content.innerHTML = `
+                    <div class="view-container">
+                        <div class="issue-header">
+                            <h2>${issue.title}</h2>
+                            <div class="issue-meta">
+                                <span>Created: ${new Date(issue.createdAt).toLocaleDateString()}</span>
+                                <div class="issue-tags">
+                                    ${issue.categories.map(cat => `<span class="tag">${cat}</span>`).join('')}
+                                </div>
+                                <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+                                    <button class="icon-btn" id="editIssueBtn" title="Edit Issue">✏️</button>
+                                    <button class="icon-btn" id="deleteIssueBtn" title="Delete Issue">🗑️</button>
+                                </div>
+                            </div>
+                            ${issue.description ? `<p style="margin-top: 0.8rem;">${issue.description}</p>` : ''}
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab ${this.activeTab === 'details' ? 'active' : ''}" data-tab="details">Detailed View</div>
+                            <div class="tab ${this.activeTab === 'compare' ? 'active' : ''}" data-tab="compare">Comparison Table</div>
+                            <div class="tab ${this.activeTab === 'summary' ? 'active' : ''}" data-tab="summary">Summary</div>
+                        </div>
+                        
+                        <div class="tab-content">
+                            ${this.renderTabContent(issue, this.activeTab)}
+                        </div>
+                    </div>
+                `;
+                
+                // Bind tab switching
+                const tabs = $$('.tab');
+                tabs.forEach(tab => {
+                    on(tab, 'click', () => {
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        this.activeTab = tab.dataset.tab;
+                        $('.tab-content').innerHTML = this.renderTabContent(issue, this.activeTab);
+                    });
+                });
+                
+                // Bind edit and delete
+                on($('#editIssueBtn'), 'click', () => this.openIssueModal(issue));
+                on($('#deleteIssueBtn'), 'click', () => this.confirmDeleteIssue(issue));
+            },
+            
+            renderTabContent(issue, tab) {
+                switch (tab) {
+                    case 'details':
+                        return this.renderDetailsTab(issue);
+                    case 'compare':
+                        return this.renderCompareTab(issue);
+                    case 'summary':
+                        return this.renderSummaryTab(issue);
+                    default:
+                        return this.renderDetailsTab(issue);
+                }
+            },
+            
+            renderDetailsTab(issue) {
+                if (!issue.madhahib || issue.madhahib.length === 0) {
+                    return `
+                        <div class="empty-state">
+                            <h3>No madhahib positions added yet</h3>
+                            <p>Click the edit button to add positions from different madhahib or scholars</p>
+                            <button class="action" id="editIssueBtn2">Add Positions</button>
+                        </div>
+                    `;
+                }
+                
+                const madhahib = issue.madhahib.map(madhab => `
+                    <div class="madhhab-card">
+                        <div class="madhhab-header">
+                            <h3>${madhab.name}</h3>
+                        </div>
+                        <div class="madhhab-body">
+                            <div class="madhhab-section">
+                                <h4>Ruling</h4>
+                                <p>${madhab.ruling}</p>
+                            </div>
+                            
+                            <div class="madhhab-section">
+                                <h4>Reasoning</h4>
+                                <p>${madhab.reasoning}</p>
+                            </div>
+                            
+                            ${madhab.evidence && madhab.evidence.length > 0 ? `
+                                <div class="madhhab-section">
+                                    <h4>Evidence</h4>
+                                    ${madhab.evidence.map(ev => `
+                                        <div class="evidence-item">
+                                            <div class="evidence-source">${ev.source}</div>
+                                            <div class="${ev.isArabic ? 'arabic' : ev.isUrdu ? 'urdu' : ''}">${ev.text}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                
+                const html = `
+                    <div class="madhhab-grid">
+                        ${madhahib}
+                    </div>
+                    
+                    ${issue.relatedIssues && issue.relatedIssues.length > 0 ? `
+                        <div class="related-issues">
+                            <h3>Related Issues</h3>
+                            <div class="related-issues-list" id="viewRelatedIssues">
+                                ${issue.relatedIssues.map(relId => `
+                                    <div class="related-issue-item" data-id="${relId}">Loading...</div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+                
+                // After rendering, load related issues titles
+                setTimeout(() => {
+                    if (issue.relatedIssues && issue.relatedIssues.length > 0) {
+                        issue.relatedIssues.forEach(async (relId) => {
+                            const relatedIssue = await idbP.get('issues', parseInt(relId));
+                            if (relatedIssue) {
+                                const relEl = $(`#viewRelatedIssues .related-issue-item[data-id="${relId}"]`);
+                                if (relEl) {
+                                    relEl.textContent = relatedIssue.title;
+                                    on(relEl, 'click', () => this.loadIssue(relId));
+                                }
+                            }
+                        });
+                    }
+                }, 0);
+                
+                return html;
+            },
+            
+            renderCompareTab(issue) {
+                if (!issue.madhahib || issue.madhahib.length === 0) {
+                    return `
+                        <div class="empty-state">
+                            <h3>No madhahib positions to compare</h3>
+                            <p>Add positions from different madhahib or scholars to enable comparison</p>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div style="overflow-x: auto;">
+                        <table class="compare-table">
+                            <thead>
+                                <tr>
+                                    <th>Madhab/Scholar</th>
+                                    <th>Ruling</th>
+                                    <th>Reasoning</th>
+                                    <th>Primary Evidence</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${issue.madhahib.map(madhab => `
+                                    <tr>
+                                        <td><strong>${madhab.name}</strong></td>
+                                        <td>${madhab.ruling}</td>
+                                        <td>${madhab.reasoning}</td>
+                                        <td>
+                                            ${madhab.evidence && madhab.evidence.length > 0 ? 
+                                                madhab.evidence.map(ev => `
+                                                    <div class="evidence-item">
+                                                        <div class="evidence-source">${ev.source}</div>
+                                                    </div>
+                                                `).join('')
+                                            : 'No evidence provided'}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            },
+            
+            renderSummaryTab(issue) {
+                return `
+                    <div class="summary-section">
+                        ${issue.summary ? `
+                            <h3>Your Comparative Analysis</h3>
+                            <p>${issue.summary}</p>
+                        ` : `
+                            <div class="empty-state">
+                                <h3>No summary provided</h3>
+                                <p>Add your comparative analysis to summarize the different positions</p>
+                                <button class="action" id="addSummaryBtn">Add Summary</button>
+                            </div>
+                        `}
+                    </div>
+                    
+                    ${issue.madhahib && issue.madhahib.length > 0 ? `
+                        <div class="summary-section">
+                            <h3>Key Points of Difference</h3>
+                            <ul style="margin-left: 1.5rem;">
+                                ${issue.madhahib.map(madhab => `
+                                    <li><strong>${madhab.name}:</strong> ${madhab.ruling}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                `;
+            },
+            
+            renderEmptyState() {
+                $('#mainContent').innerHTML = `
+                    <div class="empty-state">
+                        <h3>Welcome to FiqhCompare Studio</h3>
+                        <p>This tool helps you compare Fiqh rulings from different Madhhabs based on your research notes.</p>
+                        <p><strong>Disclaimer:</strong> This tool is for personal academic comparison only, not for deriving personal Fiqh rulings.</p>
+                        <button class="action" id="createFirstIssueBtn">Create Your First Fiqh Issue</button>
+                    </div>
+                `;
+                
+                on($('#createFirstIssueBtn'), 'click', () => this.openIssueModal());
+            },
+            
+            openIssueModal(issue = null) {
+                const modal = $('#issueModal');
+                const form = $('#issueForm');
+                const title = $('#issueModalTitle');
+                
+                // Clear form
+                form.reset();
+                $('#madhahibContainer').innerHTML = '';
+                $('#selectedCategories').value = '';
+                this.selectedCategories = [];
+                
+                // Reset category tags
+                $$('#issueForm .tag').forEach(tag => tag.classList.remove('active'));
+                
+                // Set modal title
+                title.textContent = issue ? 'Edit Fiqh Issue' : 'New Fiqh Issue';
+                
+                // If editing, populate form
+                if (issue) {
+                    $('#issueId').value = issue.id;
+                    $('#issueTitle').value = issue.title;
+                    $('#issueDescription').value = issue.description || '';
+                    $('#issueSummary').value = issue.summary || '';
+                    
+                    // Set categories
+                    issue.categories.forEach(category => {
+                        let tag = $(`#issueForm .tag[data-category="${category}"]`);
+                        if (!tag) {
+                            this.addCategoryTag(category);
+                            tag = $(`#issueForm .tag[data-category="${category}"]`);
+                        }
+                        tag.classList.add('active');
+                    });
+                    this.selectedCategories = [...issue.categories];
+                    $('#selectedCategories').value = JSON.stringify(this.selectedCategories);
+                    
+                    // Add madhahib
+                    if (issue.madhahib && issue.madhahib.length > 0) {
+                        issue.madhahib.forEach(madhab => {
+                            this.addMadhabFields(madhab);
+                        });
+                    }
+                    
+                    // Add related issues
+                    this.populateRelatedIssues(issue);
+                } else {
+                    // Add at least one empty madhab field
+                    this.addMadhabFields();
+                    this.populateRelatedIssues();
+                }
+                
+                // Show modal
+                modal.classList.add('active');
+            },
+            
+            closeIssueModal() {
+                $('#issueModal').classList.remove('active');
+            },
+            
+            addCategoryTag(category) {
+                const tagsContainer = $('#issueForm .tag-list');
+                const existingTag = $(`#issueForm .tag[data-category="${category}"]`);
+                
+                if (!existingTag) {
+                    const tag = document.createElement('span');
+                    tag.className = 'tag';
+                    tag.dataset.category = category;
+                    tag.textContent = category;
+                    
+                    on(tag, 'click', () => {
+                        tag.classList.toggle('active');
+                        this.updateSelectedCategories();
+                    });
+                    
+                    tagsContainer.insertBefore(tag, $('#newCategoryInput'));
+                    
+                    // Also add to sidebar if not exists
+                    if (!$(`#categoryTags .tag[data-category="${category}"]`)) {
+                        const sidebarTag = document.createElement('span');
+                        sidebarTag.className = 'tag';
+                        sidebarTag.dataset.category = category;
+                        sidebarTag.textContent = category;
+                        
+                        on(sidebarTag, 'click', () => {
+                            sidebarTag.classList.toggle('active');
+                            const activeCategories = Array.from($$('#categoryTags .tag.active'))
+                                .map(t => t.dataset.category);
+                            
+                            this.filterIssuesByCategories(activeCategories);
+                        });
+                        
+                        $('#categoryTags').appendChild(sidebarTag);
+                    }
+                }
+            },
+            
+            updateSelectedCategories() {
+                const activeTags = $$('#issueForm .tag.active');
+                this.selectedCategories = Array.from(activeTags).map(tag => tag.dataset.category);
+                $('#selectedCategories').value = JSON.stringify(this.selectedCategories);
+            },
+            
+            addMadhabFields(madhab = null) {
+                const container = $('#madhahibContainer');
+                const madhabId = Date.now();
+                
+                const div = document.createElement('div');
+                div.className = 'madhhab-fields';
+                div.dataset.id = madhabId;
+                
+                div.innerHTML = `
+                    <div class="madhhab-fields-header">
+                        <h4>${madhab ? 'Edit Madhab/Scholar Position' : 'Add Madhab/Scholar Position'}</h4>
+                        <button type="button" class="icon-btn remove-madhab-btn" data-id="${madhabId}">✕</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Madhab/Scholar Name</label>
+                        <input type="text" class="form-control madhab-name" value="${madhab ? madhab.name : ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Ruling</label>
+                        <textarea class="form-control madhab-ruling">${madhab ? madhab.ruling : ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Reasoning</label>
+                        <textarea class="form-control madhab-reasoning">${madhab ? madhab.reasoning : ''}</textarea>
+                    </div>
+                    
+                    <div class="evidence-container" data-madhab="${madhabId}">
+                        ${madhab && madhab.evidence ? 
+                            madhab.evidence.map(ev => this.createEvidenceHTML(madhabId, ev)).join('') 
+                            : ''}
+                    </div>
+                    
+                    <button type="button" class="action secondary sm add-evidence-btn" data-madhab="${madhabId}">
+                        Add Evidence
+                    </button>
+                `;
+                
+                container.appendChild(div);
+                
+                // Bind remove madhab button
+                on(div.querySelector('.remove-madhab-btn'), 'click', () => {
+                    container.removeChild(div);
+                });
+                
+                // Bind add evidence button
+                on(div.querySelector('.add-evidence-btn'), 'click', () => {
+                    this.addEvidenceFields(madhabId);
+                });
+                
+                // Add one evidence field if there are none
+                if (!madhab || !madhab.evidence || madhab.evidence.length === 0) {
+                    this.addEvidenceFields(madhabId);
+                }
+            },
+            
+            createEvidenceHTML(madhabId, evidence = null) {
+                const evidenceId = Date.now() + Math.floor(Math.random() * 1000);
+                
+                return `
+                    <div class="evidence-fields" data-id="${evidenceId}">
+                        <div class="evidence-fields-header">
+                            <h4>Evidence</h4>
+                            <button type="button" class="icon-btn remove-evidence-btn" data-id="${evidenceId}">✕</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Source</label>
+                            <input type="text" class="form-control evidence-source" value="${evidence ? evidence.source : ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                Text 
+                                <button type="button" class="lang-toggle arabic-toggle ${evidence && evidence.isArabic ? 'active' : ''}" data-id="${evidenceId}">Arabic</button>
+                                <button type="button" class="lang-toggle urdu-toggle ${evidence && evidence.isUrdu ? 'active' : ''}" data-id="${evidenceId}">Urdu</button>
+                            </label>
+                            <textarea class="form-control evidence-text ${evidence && evidence.isArabic ? 'arabic' : evidence && evidence.isUrdu ? 'urdu' : ''}" data-id="${evidenceId}">${evidence ? evidence.text : ''}</textarea>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            addEvidenceFields(madhabId, evidence = null) {
+                const container = $(`.evidence-container[data-madhab="${madhabId}"]`);
+                const html = this.createEvidenceHTML(madhabId, evidence);
+                
+                // Insert HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const evidenceEl = tempDiv.firstElementChild;
+                container.appendChild(evidenceEl);
+                
+                // Bind remove evidence button
+                on(evidenceEl.querySelector('.remove-evidence-btn'), 'click', () => {
+                    container.removeChild(evidenceEl);
+                });
+                
+                // Bind language toggle buttons
+                const evidenceId = evidenceEl.dataset.id;
+                
+                on(evidenceEl.querySelector('.arabic-toggle'), 'click', (e) => {
+                    const btn = e.target;
+                    const textArea = $(`.evidence-text[data-id="${evidenceId}"]`);
+                    
+                    btn.classList.toggle('active');
+                    $('.urdu-toggle[data-id="' + evidenceId + '"]').classList.remove('active');
+                    
+                    if (btn.classList.contains('active')) {
+                        textArea.classList.add('arabic');
+                        textArea.classList.remove('urdu');
+                    } else {
+                        textArea.classList.remove('arabic');
+                    }
+                });
+                
+                on(evidenceEl.querySelector('.urdu-toggle'), 'click', (e) => {
+                    const btn = e.target;
+                    const textArea = $(`.evidence-text[data-id="${evidenceId}"]`);
+                    
+                    btn.classList.toggle('active');
+                    $('.arabic-toggle[data-id="' + evidenceId + '"]').classList.remove('active');
+                    
+                    if (btn.classList.contains('active')) {
+                        textArea.classList.add('urdu');
+                        textArea.classList.remove('arabic');
+                    } else {
+                        textArea.classList.remove('urdu');
+                    }
+                });
+            },
+            
+            async populateRelatedIssues(issue = null) {
+                const select = $('#relatedIssueSelect');
+                const container = $('#relatedIssuesContainer');
+                
+                // Clear existing
+                select.innerHTML = '<option value="">Select related issue</option>';
+                container.innerHTML = '';
+                
+                // Get all issues
+                const issues = await idbP.getAll('issues');
+                const currentId = issue ? issue.id : parseInt($('#issueId').value) || 0;
+                const relatedIds = issue && issue.relatedIssues ? issue.relatedIssues : [];
+                
+                // Add options to select
+                issues.forEach(i => {
+                    if (i.id !== currentId) {
+                        const option = document.createElement('option');
+                        option.value = i.id;
+                        option.textContent = i.title;
+                        select.appendChild(option);
+                    }
+                });
+                
+                // Add related issues to container
+                if (relatedIds.length > 0) {
+                    relatedIds.forEach(async (id) => {
+                        const relatedIssue = issues.find(i => i.id === parseInt(id));
+                        if (relatedIssue) {
+                            this.addRelatedIssueTag(relatedIssue.id, relatedIssue.title);
+                        }
+                    });
+                }
+                
+                // Bind select change
+                on(select, 'change', (e) => {
+                    if (e.target.value) {
+                        const id = parseInt(e.target.value);
+                        const issue = issues.find(i => i.id === id);
+                        if (issue) {
+                            this.addRelatedIssueTag(issue.id, issue.title);
+                            e.target.value = '';
+                        }
+                    }
+                });
+            },
+            
+            addRelatedIssueTag(id, title) {
+                const container = $('#relatedIssuesContainer');
+                
+                // Check if already exists
+                if ($(`#relatedIssuesContainer .related-issue-tag[data-id="${id}"]`)) {
+                    return;
+                }
+                
+                const tag = document.createElement('div');
+                tag.className = 'related-issue-tag tag';
+                tag.dataset.id = id;
+                tag.innerHTML = `
+                    <span>${title}</span>
+                    <button type="button" class="remove-related-btn">×</button>
+                `;
+                
+                container.appendChild(tag);
+                
+                // Bind remove button
+                on(tag.querySelector('.remove-related-btn'), 'click', () => {
+                    container.removeChild(tag);
+                });
+            },
+            
+            getFormData() {
+                const id = $('#issueId').value ? parseInt($('#issueId').value) : null;
+                const title = $('#issueTitle').value.trim();
+                const description = $('#issueDescription').value.trim();
+                const summary = $('#issueSummary').value.trim();
+                
+                // Get categories
+                const categories = this.selectedCategories;
+                
+                // Get madhahib
+                const madhahib = [];
+                const madhabFields = $$('.madhhab-fields');
+                
+                madhabFields.forEach(field => {
+                    const name = field.querySelector('.madhab-name').value.trim();
+                    const ruling = field.querySelector('.madhab-ruling').value.trim();
+                    const reasoning = field.querySelector('.madhab-reasoning').value.trim();
+                    
+                    if (name) {
+                        const madhabId = field.dataset.id;
+                        const evidence = [];
+                        
+                        const evidenceFields = $$(`.evidence-fields[data-id]`, field);
+                        evidenceFields.forEach(ef => {
+                            const source = ef.querySelector('.evidence-source').value.trim();
+                            const textEl = ef.querySelector('.evidence-text');
+                            const text = textEl.value.trim();
+                            const isArabic = textEl.classList.contains('arabic');
+                            const isUrdu = textEl.classList.contains('urdu');
+                            
+                            if (source && text) {
+                                evidence.push({ source, text, isArabic, isUrdu });
+                            }
+                        });
+                        
+                        madhahib.push({ name, ruling, reasoning, evidence });
+                    }
+                });
+                
+                // Get related issues
+                const relatedIssues = Array.from($$('#relatedIssuesContainer .related-issue-tag'))
+                    .map(tag => parseInt(tag.dataset.id));
+                
+                const now = Date.now();
+                
+                return {
+                    id,
+                    title,
+                    description,
+                    categories,
+                    madhahib,
+                    summary,
+                    relatedIssues,
+                    createdAt: id ? undefined : now,
+                    updatedAt: now
+                };
+            },
+            
+            async saveIssue() {
+                const data = this.getFormData();
+                
+                if (!data.title) {
+                    this.showNotification('Issue title is required', 'error');
+                    return;
+                }
+                
+                try {
+                    if (data.id) {
+                        // Get existing to preserve createdAt
+                        const existing = await idbP.get('issues', data.id);
+                        data.createdAt = existing.createdAt;
+                        
+                        await idbP.update('issues', data);
+                    } else {
+                        await idbP.add('issues', data);
+                    }
+                    
+                    this.closeIssueModal();
+                    this.loadIssuesList();
+                    
+                    if (data.id) {
+                        this.loadIssue(data.id);
+                    }
+                    
+                    this.showNotification('Issue saved successfully');
+                } catch (error) {
+                    console.error('Error saving issue:', error);
+                    this.showNotification('Error saving issue', 'error');
+                }
+            },
+            
+            async confirmDeleteIssue(issue) {
+                if (confirm(`Are you sure you want to delete "${issue.title}"?`)) {
+                    try {
+                        await idbP.delete('issues', issue.id);
+						this.loadIssuesList();
+						$('#mainContent').innerHTML = this.renderEmptyState();
+						this.showNotification('Issue deleted');
+						} catch (error) {
+						console.error('Error deleting issue:', error);
+						this.showNotification('Error deleting issue', 'error');
+						}
+						}
+						},
+
+            async searchIssues(term) {
+                if (!term.trim()) {
+                    this.loadIssuesList();
+                    return;
+                }
+                
+                try {
+                    const results = await idbP.search('issues', term);
+                    
+                    const list = $('#issuesList');
+                    list.innerHTML = '';
+                    
+                    results.forEach(issue => {
+                        const item = document.createElement('li');
+                        item.className = 'issue-item';
+                        item.textContent = issue.title;
+                        item.dataset.id = issue.id;
+                        
+                        on(item, 'click', () => this.loadIssue(issue.id));
+                        
+                        list.appendChild(item);
+                    });
+                } catch (error) {
+                    console.error('Error searching issues:', error);
+                    this.showNotification('Error searching issues', 'error');
+                }
+            },
+            
+            async filterIssuesByCategories(categories) {
+                if (!categories || categories.length === 0) {
+                    this.loadIssuesList();
+                    return;
+                }
+                
+                try {
+                    const issues = await idbP.getAll('issues');
+                    const filtered = issues.filter(issue => 
+                        categories.some(cat => issue.categories.includes(cat))
+                    );
+                    
+                    const list = $('#issuesList');
+                    list.innerHTML = '';
+                    
+                    filtered.forEach(issue => {
+                        const item = document.createElement('li');
+                        item.className = 'issue-item';
+                        item.textContent = issue.title;
+                        item.dataset.id = issue.id;
+                        
+                        on(item, 'click', () => this.loadIssue(issue.id));
+                        
+                        list.appendChild(item);
+                    });
+                } catch (error) {
+                    console.error('Error filtering issues:', error);
+                }
+            },
+            
+            async exportData() {
+                try {
+                    const data = await idbP.exportData();
+                    const json = JSON.stringify(data, null, 2);
+                    
+                    // Create download link
+                    const blob = new Blob([json], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `fiqh-compare-export-${new Date().toISOString().slice(0, 10)}.json`;
+                    a.click();
+                    
+                    URL.revokeObjectURL(url);
+                    this.showNotification('Data exported successfully');
+                } catch (error) {
+                    console.error('Error exporting data:', error);
+                    this.showNotification('Error exporting data', 'error');
+                }
+            },
+            
+            importData() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                
+                on(input, 'change', async (e) => {
+                    const file = e.target.files;
+                    if (file) {
+                        try {
+                            const text = await file.text();
+                            const data = JSON.parse(text);
+                            
+                            await idbP.importData(data);
+                            
+                            this.loadIssuesList();
+                            this.showNotification('Data imported successfully');
+                        } catch (error) {
+                            console.error('Error importing data:', error);
+                            this.showNotification('Error importing data', 'error');
+                        }
+                    }
+                });
+                
+                input.click();
+            },
+            
+            showNotification(message, type = 'success') {
+                const notification = $('#notification');
+                notification.textContent = message;
+                notification.className = 'notification';
+                notification.classList.add(type);
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            },
+            
+            async createSampleData() {
+                const sampleIssues = [
+                    {
+                        title: "Breaking Wudu by Touching Women",
+                        description: "Does touching a woman break wudu?",
+                        categories: ["Ibadat", "Taharah"],
+                        madhahib: [
+                            {
+                                name: "Hanafi",
+                                ruling: "Touching a woman does not break wudu, regardless of whether it was with desire or not.",
+                                reasoning: "The Hanafis interpret the verse in Surah al-Nisa (4:43) to refer to sexual intercourse, not mere touching.",
+                                evidence: [
+                                    {
+                                        source: "Quran 4:43",
+                                        text: "أَوْ لَامَسْتُمُ النِّسَاءَ",
+                                        isArabic: true
+                                    },
+                                    {
+                                        source: "Ibn Masud's Interpretation",
+                                        text: "Ibn Masud interpreted 'laamastum' as sexual intercourse, not mere touching."
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Shafi'i",
+                                ruling: "Touching a woman (who is not a mahram) breaks wudu, whether with desire or without.",
+                                reasoning: "The Shafi'is take the word 'laamastum' in the verse literally, meaning any physical contact.",
+                                evidence: [
+                                    {
+                                        source: "Quran 4:43",
+                                        text: "أَوْ لَامَسْتُمُ النِّسَاءَ",
+                                        isArabic: true
+                                    },
+                                    {
+                                        source: "Aisha (RA)",
+                                        text: "Narrated that the Prophet (PBUH) kissed one of his wives and went to pray without performing ablution."
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Maliki",
+                                ruling: "Touching a woman breaks wudu only if done with desire and pleasure is felt.",
+                                reasoning: "The Malikis interpret the verse contextually, considering the element of desire as the effective cause.",
+                                evidence: [
+                                    {
+                                        source: "Quran 4:43",
+                                        text: "أَوْ لَامَسْتُمُ النِّسَاءَ",
+                                        isArabic: true
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Hanbali",
+                                ruling: "Touching a woman breaks wudu only if done with desire.",
+                                reasoning: "Similar to the Malikis, the Hanbalis consider desire as the effective cause for nullification of wudu.",
+                                evidence: [
+                                    {
+                                        source: "Ibn Abbas's Interpretation",
+                                        text: "Ibn Abbas interpreted 'laamastum' to mean sexual intercourse."
+                                    }
+                                ]
+                            }
+                        ],
+                        summary: "The issue revolves around the interpretation of 'laamastum' in Quran 4:43. Hanafis interpret it as sexual intercourse, so mere touching doesn't break wudu. Shafi'is take it literally, so any touching breaks wudu. Malikis and Hanbalis take a middle position, where touching with desire breaks wudu.",
+                        relatedIssues: [],
+                        createdAt: Date.now(),
+                        updatedAt: Date.now()
+                    },
+                    {
+                        title: "Reciting Fatiha Behind the Imam",
+                        description: "Is it necessary to recite Surah Fatiha when praying behind an imam?",
+                        categories: ["Ibadat", "Salah"],
+                        madhahib: [
+                            {
+                                name: "Hanafi",
+                                ruling: "It is not necessary and actually disliked (makruh) to recite Fatiha behind the imam in both loud and silent prayers.",
+                                reasoning: "Based on the verse 'When the Quran is recited, listen to it and be silent' and hadith evidence indicating the imam's recitation suffices for the followers.",
+                                evidence: [
+                                    {
+                                        source: "Quran 7:204",
+                                        text: "وَإِذَا قُرِئَ الْقُرْآنُ فَاسْتَمِعُوا لَهُ وَأَنصِتُوا لَعَلَّكُمْ تُرْحَمُونَ",
+                                        isArabic: true
+                                    },
+                                    {
+                                        source: "Hadith in Sahih Muslim",
+                                        text: "The Prophet (PBUH) said: 'The imam is appointed to be followed...'"
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Shafi'i",
+                                ruling: "It is necessary (wajib) to recite Fatiha in every raka'at, whether praying behind an imam or not, and whether the prayer is loud or silent.",
+                                reasoning: "Based on the hadith 'There is no prayer for one who does not recite the Opening of the Book (Fatiha)'.",
+                                evidence: [
+                                    {
+                                        source: "Sahih Bukhari",
+                                        text: "The Prophet (PBUH) said: 'There is no prayer for one who does not recite the Opening of the Book.'",
+                                    },
+                                    {
+                                        source: "Ubadah ibn as-Samit",
+                                        text: "The Prophet (PBUH) said: 'Perhaps you recite behind your imam?' We said: 'Yes.' He said: 'Don't do that except with the Opening of the Book, for there is no prayer for one who does not recite it.'"
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Maliki",
+                                ruling: "It is not necessary to recite Fatiha behind the imam in loud prayers, but it is necessary in silent prayers.",
+                                reasoning: "In loud prayers, one should listen to the imam. In silent prayers, one must recite since one cannot listen to the imam.",
+                                evidence: [
+                                    {
+                                        source: "Quran 7:204",
+                                        text: "وَإِذَا قُرِئَ الْقُرْآنُ فَاسْتَمِعُوا لَهُ وَأَنصِتُوا لَعَلَّكُمْ تُرْحَمُونَ",
+                                        isArabic: true
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Hanbali",
+                                ruling: "It is recommended (mustahabb) but not obligatory to recite Fatiha behind the imam.",
+                                reasoning: "Combines various evidences, recognizing both the importance of Fatiha and the role of the imam's recitation.",
+                                evidence: [
+                                    {
+                                        source: "Various hadith",
+                                        text: "Combining evidence from various hadith supporting both positions."
+                                    }
+                                ]
+                            }
+                        ],
+                        summary: "The differences stem from how scholars reconcile seemingly contradictory hadith on this issue. The Hanafis emphasize following the imam and remaining silent. The Shafi'is emphasize the necessity of Fatiha in every prayer. The Malikis and Hanbalis take intermediate positions.",
+                        relatedIssues: [],
+                        createdAt: Date.now() - 86400000,
+                        updatedAt: Date.now() - 86400000
+                    }
+                ];
+                
+                // Add sample issues to database
+                for (const issue of sampleIssues) {
+                    await idbP.add('issues', issue);
+                }
+                
+                // Update related issues
+                const issues = await idbP.getAll('issues');
+                if (issues.length >= 2) {
+                    issues.relatedIssues = [issues.id];
+                    issues.relatedIssues = [issues.id];
+                    
+                    await idbP.update('issues', issues);
+                    await idbP.update('issues', issues);
+                }
+                
+                this.loadIssuesList();
+            }
+        };
+        
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+    </body>
+</html>
